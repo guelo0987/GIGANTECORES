@@ -1,0 +1,41 @@
+# .NET Core
+bin/
+obj/
+*.user
+*.suo
+.vs/
+.vscode/
+*.dll
+*.pdb
+*.cache
+
+# IDE - Rider
+.idea/
+*.sln.iml
+.idea.*
+
+# Environment Files
+
+
+# Logs
+logs/
+*.log
+
+# Dependencies
+node_modules/
+packages/
+
+# Build results
+[Dd]ebug/
+[Rr]elease/
+x64/
+x86/
+[Aa][Rr][Mm]/
+[Aa][Rr][Mm]64/
+bld/
+[Bb]in/
+[Oo]bj/
+
+# Misc
+.DS_Store
+Thumbs.db 
