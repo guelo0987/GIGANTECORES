@@ -145,7 +145,11 @@ if (app.Environment.IsDevelopment())
 
 
 // Configurar la escucha del puerto 8080 para Google Cloud Run
-// Ensure the app binds to 8080, which is required for Cloud Run
+var port = Environment.GetEnvironmentVariable("PORT") ?? "8080";
+builder.WebHost.ConfigureKestrel(options =>
+{
+    options.ListenAnyIP(int.Parse(port));
+});
 
 
 
