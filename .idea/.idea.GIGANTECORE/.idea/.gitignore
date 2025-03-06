@@ -1,0 +1,27 @@
+# Default ignored files
+/shelf/
+/workspace.xml
+
+# Rider ignored files
+/projectSettingsUpdater.xml
+/modules.xml
+/contentModel.xml
+/.idea.GIGANTECORE.iml
+
+# Editor-based HTTP Client requests
+/httpRequests/
+
+# Datasource local storage ignored files
+/dataSources/
+/dataSources.local.xml
+
+# Environment Files
+.env
+.env.local
+.env.development
+.env.test
+.env.production
+
+# Sensitive appsettings
+appsettings.Production.json
+appsettings.Development.json

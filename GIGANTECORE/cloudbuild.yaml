@@ -23,7 +23,7 @@ steps:
       - '--region=us-east1'
       - '--platform=managed'
       - '--allow-unauthenticated'
-      - '--set-env-vars=PORT=8080'  # Ensure PORT is set
+       
 
 images:
   - 'gcr.io/$PROJECT_ID/gigantecore'
