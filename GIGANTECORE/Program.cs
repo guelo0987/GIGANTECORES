@@ -23,7 +23,7 @@ var config = new ConfigurationBuilder()
     .Build();
 
 
-var allowedOrigins = config["ALLOWED_ORIGINS"]?.Split(",", StringSplitOptions.RemoveEmptyEntries) ?? new string[] {};
+
 
 
 // 1. Configuración de logs
@@ -117,10 +117,9 @@ builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowReactApp",
         builder => builder
-            .WithOrigins(allowedOrigins)  // Ensure this is properly set
+            .WithOrigins("http://localhost:3000")  // Ensure this is properly set
             .AllowAnyMethod()
             .AllowAnyHeader()
-            .SetIsOriginAllowed(origin => allowedOrigins.Contains(origin)) // Fix for wildcard issue
             .AllowCredentials());  // Only use AllowCredentials if origins are explicitly listed
 });
 
