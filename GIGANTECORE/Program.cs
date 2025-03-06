@@ -139,16 +139,14 @@ var app = builder.Build();
 
 
 
-// B. Swagger solo en desarrollo
-if (app.Environment.IsDevelopment())
+// B. Swagger en todos los entornos (no solo desarrollo)
+app.UseSwagger();
+app.UseSwaggerUI(c => 
 {
-    app.UseSwagger();
-    app.UseSwaggerUI(c => 
-    {
-        c.SwaggerEndpoint("/swagger/v1/swagger.json", "GIGANTE CORE API v1");
-        c.ConfigObject.DisplayRequestDuration = true;
-    });
-}
+    c.SwaggerEndpoint("/swagger/v1/swagger.json", "GIGANTE CORE API v1");
+    c.ConfigObject.DisplayRequestDuration = true;
+    c.RoutePrefix = "swagger"; // Esto es importante
+});
 
 
 // C. Orden CRÍTICO de middlewares
