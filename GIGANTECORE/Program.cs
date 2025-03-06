@@ -112,14 +112,16 @@ builder.Services.AddSwaggerGen(c =>
 
 // 7. Configuración CORS
 
+// Fix CORS policy: Remove wildcard origin (*) when using credentials
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowReactApp",
         builder => builder
-            .WithOrigins(allowedOrigins)
+            .WithOrigins(allowedOrigins)  // Ensure this is properly set
             .AllowAnyMethod()
             .AllowAnyHeader()
-            .AllowCredentials());
+            .SetIsOriginAllowed(origin => allowedOrigins.Contains(origin)) // Fix for wildcard issue
+            .AllowCredentials());  // Only use AllowCredentials if origins are explicitly listed
 });
 
 // Add this to your Program.cs where services are registered
@@ -144,8 +146,10 @@ if (app.Environment.IsDevelopment())
 
 
 // Configurar la escucha del puerto 8080 para Google Cloud Run
+// Ensure the app binds to 8080, which is required for Cloud Run
 var port = Environment.GetEnvironmentVariable("PORT") ?? "8080";
 app.Urls.Add($"http://0.0.0.0:{port}");
+
 
 // C. Orden CRÍTICO de middlewares
 app.UseHttpsRedirection();

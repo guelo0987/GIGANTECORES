@@ -6,24 +6,24 @@ steps:
       - '-t'
       - 'gcr.io/$PROJECT_ID/gigantecore'
       - '-f'
-      - 'Dockerfile'      # Path to Dockerfile (relative to context)
-      - '.'               # Build context is the repository root
+      - 'Dockerfile'
+      - '.'  
 
-  # Step 2: Push the image to Google Container Registry (or Artifact Registry if configured)
+  # Step 2: Push the image to Google Container Registry
   - name: 'gcr.io/cloud-builders/docker'
     args: ['push', 'gcr.io/$PROJECT_ID/gigantecore']
 
-  # Step 3: Deploy to Cloud Run
+  # Step 3: Deploy to Cloud Run with environment variables
   - name: 'gcr.io/cloud-builders/gcloud'
     args:
       - 'run'
       - 'deploy'
-      - 'gigantecore'                        # Cloud Run service name (use lowercase)
+      - 'gigantecore'
       - '--image=gcr.io/$PROJECT_ID/gigantecore'
       - '--region=us-east1'
       - '--platform=managed'
-      - '--allow-unauthenticated'            # (Optional) allow public access
-      # Additional deployment options (e.g., environment variables) can be added here
+      - '--allow-unauthenticated'
+      - '--set-env-vars=PORT=8080'  # Ensure PORT is set
 
 images:
   - 'gcr.io/$PROJECT_ID/gigantecore'
