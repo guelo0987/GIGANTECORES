@@ -127,6 +127,13 @@ builder.Services.AddCors(options =>
 builder.Services.AddScoped<AdminProductoMedia>();
 builder.Services.AddScoped<AdminMultiMedia>();
 
+// Configurar la escucha del puerto 8080 para Google Cloud Run
+var port = Environment.GetEnvironmentVariable("PORT") ?? "8080";
+builder.WebHost.ConfigureKestrel(options =>
+{
+    options.ListenAnyIP(int.Parse(port));
+});
+
 var app = builder.Build();
 
 
@@ -142,15 +149,6 @@ if (app.Environment.IsDevelopment())
         c.ConfigObject.DisplayRequestDuration = true;
     });
 }
-
-
-// Configurar la escucha del puerto 8080 para Google Cloud Run
-var port = Environment.GetEnvironmentVariable("PORT") ?? "8080";
-builder.WebHost.ConfigureKestrel(options =>
-{
-    options.ListenAnyIP(int.Parse(port));
-});
-
 
 
 // C. Orden CRÍTICO de middlewares
