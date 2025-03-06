@@ -1,29 +1,31 @@
 steps:
-  # Step 1: Build the Docker image
-  - name: 'gcr.io/cloud-builders/docker'
+  - name: gcr.io/cloud-builders/docker
     args:
-      - 'build'
+      - build
+      - '--no-cache'
       - '-t'
-      - 'gcr.io/$PROJECT_ID/gigantecore'
+      - '$_GCR_HOSTNAME/$PROJECT_ID/$_SERVICE_NAME:$COMMIT_SHA'
+      - .
       - '-f'
-      - 'Dockerfile'
-      - '.'  
-
-  # Step 2: Push the image to Google Container Registry
-  - name: 'gcr.io/cloud-builders/docker'
-    args: ['push', 'gcr.io/$PROJECT_ID/gigantecore']
-
-  # Step 3: Deploy to Cloud Run with environment variables
-  - name: 'gcr.io/cloud-builders/gcloud'
+      - Dockerfile
+    id: Build
+  - name: gcr.io/cloud-builders/docker
     args:
-      - 'run'
-      - 'deploy'
-      - 'gigantecore'
-      - '--image=gcr.io/$PROJECT_ID/gigantecore'
-      - '--region=us-east1'
-      - '--platform=managed'
-      - '--allow-unauthenticated'
-       
+      - push
+      - '$_GCR_HOSTNAME/$PROJECT_ID/$_SERVICE_NAME:$COMMIT_SHA'
+    id: Push
+  - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk:slim'
+    args:
+      - run
+      - deploy
+      - $_SERVICE_NAME
+      - '--image'
+      - '$_GCR_HOSTNAME/$PROJECT_ID/$_SERVICE_NAME:$COMMIT_SHA'
+      - '--region'
+      - $_DEPLOY_REGION
+    entrypoint: gcloud
+    id: Deploy
+timeout: 1200s
 
 images:
-  - 'gcr.io/$PROJECT_ID/gigantecore'
+  - '$_GCR_HOSTNAME/$PROJECT_ID/$_SERVICE_NAME:$COMMIT_SHA'
