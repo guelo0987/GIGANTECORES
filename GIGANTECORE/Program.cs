@@ -282,18 +282,27 @@ app.MapGet("/api/diagnostico/auth", async (MyDbContext db) =>
     }
 });
 
-app.MapGet("/api/diagnostico/connection", () => 
+app.MapGet("/api/diagnostico/connection", async () => 
 {
     try {
         var connectionString = Environment.GetEnvironmentVariable("DATA_BASE_CONNECTION_STRING");
-        // Ocultar la contraseña para mostrar
         var maskedConnectionString = "No configurado";
+        var pingResult = false;
+        var pingError = "";
+
         if (!string.IsNullOrEmpty(connectionString))
         {
-            // Intenta crear un objeto SqlConnectionStringBuilder para validar
             try {
                 var builder = new Microsoft.Data.SqlClient.SqlConnectionStringBuilder(connectionString);
-                // Oculta la contraseña
+                var server = builder.DataSource.Split(',')[0];
+                
+                using (var ping = new System.Net.NetworkInformation.Ping())
+                {
+                    var reply = await ping.SendPingAsync(server, 1000);
+                    pingResult = reply.Status == System.Net.NetworkInformation.IPStatus.Success;
+                    pingError = reply.Status.ToString();
+                }
+                
                 builder.Password = "***HIDDEN***";
                 maskedConnectionString = builder.ToString();
             }
@@ -304,7 +313,9 @@ app.MapGet("/api/diagnostico/connection", () =>
         
         return Results.Ok(new { 
             ConnectionStringConfigured = !string.IsNullOrEmpty(connectionString),
-            MaskedConnectionString = maskedConnectionString
+            MaskedConnectionString = maskedConnectionString,
+            ServerPingSuccess = pingResult,
+            PingStatus = pingError
         });
     }
     catch (Exception ex) {
