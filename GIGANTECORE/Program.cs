@@ -150,12 +150,42 @@ app.UseSwaggerUI(c =>
 
 
 // C. Orden CRÍTICO de middlewares
-app.UseHttpsRedirection();
+// Comentar o eliminar esta línea en entorno de producción
+// app.UseHttpsRedirection();
+
+// Alternativa: solo usar redirección HTTPS en desarrollo
+if (app.Environment.IsDevelopment())
+{
+    app.UseHttpsRedirection();
+}
 app.UseRouting();
 app.UseCors("AllowReactApp");
 app.UseAuthentication();
 app.UseAuthorization();
 app.UseMiddleware<RolePermissionMiddleware>();
+
+// Agregar justo después de app.UseRouting();
+app.UseExceptionHandler(appBuilder =>
+{
+    appBuilder.Run(async context =>
+    {
+        context.Response.StatusCode = 500;
+        context.Response.ContentType = "application/json";
+        
+        var exceptionHandlerFeature = context.Features.Get<Microsoft.AspNetCore.Diagnostics.IExceptionHandlerFeature>();
+        if (exceptionHandlerFeature != null)
+        {
+            var exception = exceptionHandlerFeature.Error;
+            Log.Error(exception, "Error no manejado");
+            
+            await context.Response.WriteAsync(JsonConvert.SerializeObject(new 
+            {
+                error = "Se produjo un error interno",
+                detail = app.Environment.IsDevelopment() ? exception.ToString() : null
+            }));
+        }
+    });
+});
 
 // D. Endpoints
 app.MapControllers();
@@ -164,5 +194,22 @@ app.MapControllers();
 
 // Redireccionar la raíz a Swagger
 app.MapGet("/", () => Results.Redirect("/swagger"));
+
+// Agregar antes de app.Run() para diagnóstico (eliminar en producción después)
+app.MapGet("/api/diagnostico", (IWebHostEnvironment env) => 
+{
+    if (env.IsDevelopment())
+    {
+        var vars = new Dictionary<string, string>
+        {
+            ["JWT_KEY_LENGTH"] = (Environment.GetEnvironmentVariable("JWT_KEY")?.Length ?? 0).ToString(),
+            ["JWT_ISSUER"] = Environment.GetEnvironmentVariable("JWT_ISSUER") ?? "No configurado",
+            ["JWT_AUDIENCE"] = Environment.GetEnvironmentVariable("JWT_AUDIENCE") ?? "No configurado",
+            ["DB_CONNECTION"] = "Configurado: " + (!string.IsNullOrEmpty(Environment.GetEnvironmentVariable("DATA_BASE_CONNECTION_STRING"))).ToString()
+        };
+        return Results.Ok(vars);
+    }
+    return Results.NotFound();
+});
 
 app.Run();
