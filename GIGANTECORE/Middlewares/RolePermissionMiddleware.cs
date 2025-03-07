@@ -18,7 +18,11 @@ public class RolePermissionMiddleware
         Console.WriteLine($"Ruta completa: {path}");
 
         // Excluir rutas específicas
-        if (path != null && (path.StartsWith("/api/Auth/login") || path.StartsWith("/api/Auth/register")))
+        if (path != null && (
+            path.StartsWith("/api/Auth/login") || 
+            path.StartsWith("/api/Auth/register") ||
+            path.StartsWith("/api/diagnostico") ||
+            path.StartsWith("/swagger")))
         {
             await _next(context);
             return;

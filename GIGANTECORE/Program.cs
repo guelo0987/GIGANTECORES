@@ -52,7 +52,8 @@ builder.Services.AddAuthentication(options =>
 })
 .AddJwtBearer(options =>
 {
-    options.RequireHttpsMetadata = true;
+    // Cambiar a false para entorno de producción
+    options.RequireHttpsMetadata = false;
     options.SaveToken = true;
     options.TokenValidationParameters = new TokenValidationParameters
     {
@@ -195,21 +196,25 @@ app.MapControllers();
 // Redireccionar la raíz a Swagger
 app.MapGet("/", () => Results.Redirect("/swagger"));
 
-// Agregar antes de app.Run() para diagnóstico (eliminar en producción después)
-app.MapGet("/api/diagnostico", (IWebHostEnvironment env) => 
+// Endpoint de diagnóstico mejorado
+app.MapGet("/api/diagnostico", () => 
 {
-    if (env.IsDevelopment())
-    {
+    try {
         var vars = new Dictionary<string, string>
         {
             ["JWT_KEY_LENGTH"] = (Environment.GetEnvironmentVariable("JWT_KEY")?.Length ?? 0).ToString(),
             ["JWT_ISSUER"] = Environment.GetEnvironmentVariable("JWT_ISSUER") ?? "No configurado",
             ["JWT_AUDIENCE"] = Environment.GetEnvironmentVariable("JWT_AUDIENCE") ?? "No configurado",
-            ["DB_CONNECTION"] = "Configurado: " + (!string.IsNullOrEmpty(Environment.GetEnvironmentVariable("DATA_BASE_CONNECTION_STRING"))).ToString()
+            ["JWT_SUBJECT"] = Environment.GetEnvironmentVariable("JWT_SUBJECT") ?? "No configurado",
+            ["DB_CONNECTION"] = "Configurado: " + (!string.IsNullOrEmpty(Environment.GetEnvironmentVariable("DATA_BASE_CONNECTION_STRING"))).ToString(),
+            ["ASPNETCORE_ENVIRONMENT"] = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") ?? "No configurado",
+            ["PORT"] = Environment.GetEnvironmentVariable("PORT") ?? "No configurado"
         };
         return Results.Ok(vars);
     }
-    return Results.NotFound();
+    catch (Exception ex) {
+        return Results.Problem(ex.ToString());
+    }
 });
 
 app.Run();
