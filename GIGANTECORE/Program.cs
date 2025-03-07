@@ -132,7 +132,7 @@ builder.Services.AddCors(options =>
 builder.Services.AddScoped<AdminProductoMedia>();
 builder.Services.AddScoped<AdminMultiMedia>();
 
-// Configurar la escucha del puerto 8080 para Google Cloud Run
+// Configurar la escucha del puerto para desarrollo local
 var port = Environment.GetEnvironmentVariable("PORT") ?? "8080";
 builder.WebHost.ConfigureKestrel(options =>
 {
@@ -374,6 +374,24 @@ app.MapGet("/api/diagnostico/sqltest", async () =>
         
         return Results.Ok(new { 
             TestResult = result
+        });
+    }
+    catch (Exception ex) {
+        return Results.Problem(ex.ToString());
+    }
+});
+
+app.MapGet("/api/diagnostico/ip", async (HttpContext context) => 
+{
+    try {
+        // Obtener la IP del servidor
+        var hostName = System.Net.Dns.GetHostName();
+        var ips = await System.Net.Dns.GetHostAddressesAsync(hostName);
+        
+        return Results.Ok(new { 
+            HostName = hostName,
+            ServerIPs = ips.Select(ip => ip.ToString()).ToArray(),
+            ClientIP = context.Connection.RemoteIpAddress?.ToString()
         });
     }
     catch (Exception ex) {
