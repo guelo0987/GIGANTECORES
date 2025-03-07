@@ -11,6 +11,7 @@ using System.IO;
 using GIGANTECORE.Utils;
 using Microsoft.OpenApi.Models;
 using DotEnv.Core;
+using Microsoft.AspNetCore.Mvc;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -214,6 +215,67 @@ app.MapGet("/api/diagnostico", () =>
     }
     catch (Exception ex) {
         return Results.Problem(ex.ToString());
+    }
+});
+
+app.MapGet("/api/diagnostico/db", async (MyDbContext db) => 
+{
+    try {
+        bool canConnect = false;
+        string errorMessage = "";
+        
+        try {
+            canConnect = await db.Database.CanConnectAsync();
+        }
+        catch (Exception ex) {
+            errorMessage = ex.Message;
+        }
+        
+        return Results.Ok(new { 
+            CanConnect = canConnect,
+            Error = errorMessage,
+            ConnectionString = "***HIDDEN***" // No mostrar la cadena de conexión completa por seguridad
+        });
+    }
+    catch (Exception ex) {
+        return Results.Problem(ex.ToString());
+    }
+});
+
+app.MapGet("/api/diagnostico/users", async (MyDbContext db) => 
+{
+    try {
+        var userCount = await db.Admins.CountAsync();
+        return Results.Ok(new { UserCount = userCount });
+    }
+    catch (Exception ex) {
+        return Results.Problem(ex.ToString());
+    }
+});
+
+app.MapGet("/api/diagnostico/auth", async (MyDbContext db) => 
+{
+    try {
+        var adminWithRoles = await db.Admins
+            .Include(a => a.Role)
+            .Select(a => new { 
+                a.Mail, 
+                RoleName = a.Role.Name,
+                RoleId = a.RolId 
+            })
+            .ToListAsync();
+
+        return Results.Ok(new { 
+            AdminCount = adminWithRoles.Count,
+            Admins = adminWithRoles
+        });
+    }
+    catch (Exception ex) {
+        return Results.Problem(new ProblemDetails {
+            Title = "Error al consultar admins",
+            Detail = ex.Message + "\n" + ex.InnerException?.Message,
+            Status = 500
+        });
     }
 });
 

@@ -36,51 +36,62 @@ public class AuthController:ControllerBase
     [HttpPost("login")]
     public async Task<IActionResult> AuthenticateAdmin([FromBody] LoginRequest loginRequest)
     {
-        // Buscar el administrador por correo
-        var admin = await _db.Admins
-            .Include(o => o.Role)
-            .FirstOrDefaultAsync(a => a.Mail == loginRequest.Mail);
-
-        if (admin == null)
+        try
         {
-            _logger.LogError("Usuario no encontrado.");
-            return Unauthorized("Credenciales inválidas.");
+            _logger.LogInformation($"Intento de login para: {loginRequest.Mail}");
+            
+            var admin = await _db.Admins
+                .Include(o => o.Role)
+                .FirstOrDefaultAsync(a => a.Mail == loginRequest.Mail);
+
+            _logger.LogInformation($"Admin encontrado: {admin != null}, Tiene rol: {admin?.Role != null}");
+
+            if (admin == null)
+            {
+                _logger.LogError("Usuario no encontrado.");
+                return Unauthorized("Credenciales inválidas.");
+            }
+
+            // Verificar contraseña
+            if (loginRequest.Password != admin.Password)
+            {
+                _logger.LogError("Contraseña incorrecta.");
+                return Unauthorized("Credenciales inválidas.");
+            }
+
+            // Validar rol
+            if (admin.Role.Name != "Admin" && admin.Role.Name != "Empleado")
+            {
+                _logger.LogError("Rol nos válido.");
+                return Unauthorized("El usuario no tiene un rols válido.");
+            }
+
+            // Crear los claims
+            var claims = new[]
+            {
+                new Claim(JwtRegisteredClaimNames.Sub, Environment.GetEnvironmentVariable("JWT_SUBJECT")),
+                new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
+                new Claim("Id", admin.Id.ToString()),
+                new Claim(ClaimTypes.Role, admin.Role.Name) // Rol dinámico
+            };
+            
+            _logger.LogInformation("Log in Exitoso");
+
+            // Generar y devolver el token
+            return await GenerateToken(claims, new AdminDTO
+            {
+                Nombre = admin.Nombre,
+                Telefono = admin.Telefono,
+                Mail = admin.Mail,
+                Rol = admin.RolId,
+                SoloLectura = admin.SoloLectura
+            }, admin.Role.Name);
         }
-
-        // Verificar contraseña
-        if (loginRequest.Password != admin.Password)
+        catch (Exception ex)
         {
-            _logger.LogError("Contraseña incorrecta.");
-            return Unauthorized("Credenciales inválidas.");
+            _logger.LogError(ex, "Error en el proceso de login");
+            throw; // Esto nos permitirá ver el error completo en el middleware de excepciones
         }
-
-        // Validar rol
-        if (admin.Role.Name != "Admin" && admin.Role.Name != "Empleado")
-        {
-            _logger.LogError("Rol nos válido.");
-            return Unauthorized("El usuario no tiene un rols válido.");
-        }
-
-        // Crear los claims
-        var claims = new[]
-        {
-            new Claim(JwtRegisteredClaimNames.Sub, Environment.GetEnvironmentVariable("JWT_SUBJECT")),
-            new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
-            new Claim("Id", admin.Id.ToString()),
-            new Claim(ClaimTypes.Role, admin.Role.Name) // Rol dinámico
-        };
-        
-        _logger.LogInformation("Log in Exitoso");
-
-        // Generar y devolver el token
-        return await GenerateToken(claims, new AdminDTO
-        {
-            Nombre = admin.Nombre,
-            Telefono = admin.Telefono,
-            Mail = admin.Mail,
-            Rol = admin.RolId,
-            SoloLectura = admin.SoloLectura
-        }, admin.Role.Name);
     }
 
 
