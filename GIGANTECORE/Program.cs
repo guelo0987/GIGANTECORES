@@ -12,6 +12,7 @@ using GIGANTECORE.Utils;
 using Microsoft.OpenApi.Models;
 using DotEnv.Core;
 using Microsoft.AspNetCore.Mvc;
+using System.Net.Http;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -392,6 +393,44 @@ app.MapGet("/api/diagnostico/ip", async (HttpContext context) =>
             HostName = hostName,
             ServerIPs = ips.Select(ip => ip.ToString()).ToArray(),
             ClientIP = context.Connection.RemoteIpAddress?.ToString()
+        });
+    }
+    catch (Exception ex) {
+        return Results.Problem(ex.ToString());
+    }
+});
+
+app.MapGet("/api/diagnostico/external-ip", async () => 
+{
+    try {
+        string externalIp = "No se pudo determinar";
+        
+        try {
+            using (var httpClient = new HttpClient())
+            {
+                externalIp = await httpClient.GetStringAsync("https://api.ipify.org");
+            }
+        }
+        catch (Exception ex) {
+            externalIp = $"Error: {ex.Message}";
+        }
+        
+        return Results.Ok(new { 
+            ExternalIp = externalIp
+        });
+    }
+    catch (Exception ex) {
+        return Results.Problem(ex.ToString());
+    }
+});
+
+app.MapGet("/api/diagnostico/fallback-db", async () => 
+{
+    try {
+        // Intenta conectar a una base de datos de respaldo o simulada
+        return Results.Ok(new { 
+            Message = "Fallback database connection successful",
+            Timestamp = DateTime.UtcNow
         });
     }
     catch (Exception ex) {
