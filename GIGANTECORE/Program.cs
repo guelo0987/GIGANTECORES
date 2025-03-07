@@ -162,5 +162,7 @@ app.MapControllers();
 
 // E. Creación de carpetas si no existen (solo desarrollo)
 
+// Redireccionar la raíz a Swagger
+app.MapGet("/", () => Results.Redirect("/swagger"));
 
 app.Run();
