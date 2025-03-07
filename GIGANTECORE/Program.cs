@@ -342,4 +342,43 @@ app.MapGet("/api/diagnostico/connection", async () =>
     }
 });
 
+app.MapGet("/api/diagnostico/sqltest", async () => 
+{
+    try {
+        var connectionString = Environment.GetEnvironmentVariable("DATA_BASE_CONNECTION_STRING");
+        var result = "No se intentó la conexión";
+        
+        if (!string.IsNullOrEmpty(connectionString))
+        {
+            try {
+                using (var connection = new Microsoft.Data.SqlClient.SqlConnection(connectionString))
+                {
+                    await connection.OpenAsync();
+                    result = "Conexión exitosa";
+                    
+                    // Intentar una consulta simple
+                    using (var command = new Microsoft.Data.SqlClient.SqlCommand("SELECT @@VERSION", connection))
+                    {
+                        var version = await command.ExecuteScalarAsync();
+                        result += $" - Versión: {version}";
+                    }
+                }
+            }
+            catch (Exception ex) {
+                result = $"Error: {ex.Message}";
+                if (ex.InnerException != null) {
+                    result += $" | Inner: {ex.InnerException.Message}";
+                }
+            }
+        }
+        
+        return Results.Ok(new { 
+            TestResult = result
+        });
+    }
+    catch (Exception ex) {
+        return Results.Problem(ex.ToString());
+    }
+});
+
 app.Run();

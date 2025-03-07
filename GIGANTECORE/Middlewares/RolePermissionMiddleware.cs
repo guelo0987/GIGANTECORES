@@ -26,7 +26,8 @@ public class RolePermissionMiddleware
             path.StartsWith("/api/diagnostico/db") ||
             path.StartsWith("/api/diagnostico/users") ||
             path.StartsWith("/api/diagnostico/auth") ||
-            path.StartsWith("/api/diagnostico/connection")))
+            path.StartsWith("/api/diagnostico/connection") ||
+            path.StartsWith("/api/diagnostico/sqltest")))
         {
             await _next(context);
             return;
