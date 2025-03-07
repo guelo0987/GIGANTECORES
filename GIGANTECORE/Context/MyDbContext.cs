@@ -274,4 +274,18 @@ public partial class MyDbContext : DbContext
     }
 
     partial void OnModelCreatingPartial(ModelBuilder modelBuilder);
+
+    protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+    {
+        if (!optionsBuilder.IsConfigured)
+        {
+            var connectionString = Environment.GetEnvironmentVariable("DATA_BASE_CONNECTION_STRING");
+            if (string.IsNullOrEmpty(connectionString))
+            {
+                throw new InvalidOperationException("La cadena de conexión no está configurada");
+            }
+            
+            optionsBuilder.UseSqlServer(connectionString);
+        }
+    }
 }

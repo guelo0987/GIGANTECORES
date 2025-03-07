@@ -21,11 +21,12 @@ public class RolePermissionMiddleware
         if (path != null && (
             path.StartsWith("/api/Auth/login") || 
             path.StartsWith("/api/Auth/register") ||
-            path.StartsWith("/api/diagnostico") ||
             path.StartsWith("/swagger") ||
+            path.StartsWith("/api/diagnostico") ||
             path.StartsWith("/api/diagnostico/db") ||
             path.StartsWith("/api/diagnostico/users") ||
-            path.StartsWith("/api/diagnostico/auth")))
+            path.StartsWith("/api/diagnostico/auth") ||
+            path.StartsWith("/api/diagnostico/connection")))
         {
             await _next(context);
             return;

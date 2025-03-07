@@ -119,10 +119,13 @@ builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowReactApp",
         builder => builder
-            .WithOrigins("http://localhost:3000")  // Ensure this is properly set
+            .WithOrigins(
+                "http://localhost:3000",
+                "http://localhost:5203"
+            )
             .AllowAnyMethod()
             .AllowAnyHeader()
-            .AllowCredentials());  // Only use AllowCredentials if origins are explicitly listed
+            .AllowCredentials());
 });
 
 // Add this to your Program.cs where services are registered
@@ -276,6 +279,36 @@ app.MapGet("/api/diagnostico/auth", async (MyDbContext db) =>
             Detail = ex.Message + "\n" + ex.InnerException?.Message,
             Status = 500
         });
+    }
+});
+
+app.MapGet("/api/diagnostico/connection", () => 
+{
+    try {
+        var connectionString = Environment.GetEnvironmentVariable("DATA_BASE_CONNECTION_STRING");
+        // Ocultar la contraseña para mostrar
+        var maskedConnectionString = "No configurado";
+        if (!string.IsNullOrEmpty(connectionString))
+        {
+            // Intenta crear un objeto SqlConnectionStringBuilder para validar
+            try {
+                var builder = new Microsoft.Data.SqlClient.SqlConnectionStringBuilder(connectionString);
+                // Oculta la contraseña
+                builder.Password = "***HIDDEN***";
+                maskedConnectionString = builder.ToString();
+            }
+            catch (Exception ex) {
+                maskedConnectionString = $"INVÁLIDA: {ex.Message}";
+            }
+        }
+        
+        return Results.Ok(new { 
+            ConnectionStringConfigured = !string.IsNullOrEmpty(connectionString),
+            MaskedConnectionString = maskedConnectionString
+        });
+    }
+    catch (Exception ex) {
+        return Results.Problem(ex.ToString());
     }
 });
 
