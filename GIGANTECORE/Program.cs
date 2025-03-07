@@ -289,18 +289,35 @@ app.MapGet("/api/diagnostico/connection", async () =>
         var maskedConnectionString = "No configurado";
         var pingResult = false;
         var pingError = "";
+        var tcpTestResult = false;
+        var tcpTestError = "";
 
         if (!string.IsNullOrEmpty(connectionString))
         {
             try {
                 var builder = new Microsoft.Data.SqlClient.SqlConnectionStringBuilder(connectionString);
                 var server = builder.DataSource.Split(',')[0];
+                var port = 1433; // Puerto por defecto de SQL Server
                 
+                // Test ICMP (ping)
                 using (var ping = new System.Net.NetworkInformation.Ping())
                 {
                     var reply = await ping.SendPingAsync(server, 1000);
                     pingResult = reply.Status == System.Net.NetworkInformation.IPStatus.Success;
                     pingError = reply.Status.ToString();
+                }
+
+                // Test TCP
+                try {
+                    using (var tcpClient = new System.Net.Sockets.TcpClient())
+                    {
+                        await tcpClient.ConnectAsync(server, port);
+                        tcpTestResult = tcpClient.Connected;
+                    }
+                }
+                catch (Exception ex)
+                {
+                    tcpTestError = ex.Message;
                 }
                 
                 builder.Password = "***HIDDEN***";
@@ -315,7 +332,9 @@ app.MapGet("/api/diagnostico/connection", async () =>
             ConnectionStringConfigured = !string.IsNullOrEmpty(connectionString),
             MaskedConnectionString = maskedConnectionString,
             ServerPingSuccess = pingResult,
-            PingStatus = pingError
+            PingStatus = pingError,
+            TcpTestSuccess = tcpTestResult,
+            TcpTestError = tcpTestError
         });
     }
     catch (Exception ex) {
