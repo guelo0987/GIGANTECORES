@@ -13,6 +13,7 @@ using Microsoft.OpenApi.Models;
 using DotEnv.Core;
 using Microsoft.AspNetCore.Mvc;
 using System.Net.Http;
+using Microsoft.AspNetCore.ResponseCompression;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -30,7 +31,7 @@ var config = new ConfigurationBuilder()
 
 // 1. Configuración de logs
 Log.Logger = new LoggerConfiguration()
-    .MinimumLevel.Debug()
+    .MinimumLevel.Information()
     .WriteTo.File("logs/GiganteCoreLogs.txt", rollingInterval: RollingInterval.Day)
     .CreateLogger();
 
@@ -140,6 +141,13 @@ builder.WebHost.ConfigureKestrel(options =>
     options.ListenAnyIP(int.Parse(port));
 });
 
+builder.Services.AddResponseCompression(options =>
+{
+    options.EnableForHttps = true;
+    options.Providers.Add<BrotliCompressionProvider>();
+    options.Providers.Add<GzipCompressionProvider>();
+});
+
 var app = builder.Build();
 
 
@@ -169,6 +177,7 @@ app.UseCors("AllowReactApp");
 app.UseAuthentication();
 app.UseAuthorization();
 app.UseMiddleware<RolePermissionMiddleware>();
+app.UseResponseCompression();
 
 // Agregar justo después de app.UseRouting();
 app.UseExceptionHandler(appBuilder =>
@@ -202,147 +211,6 @@ app.MapControllers();
 app.MapGet("/", () => Results.Redirect("/swagger"));
 
 // Endpoint de diagnóstico mejorado
-app.MapGet("/api/diagnostico", () => 
-{
-    try {
-        var vars = new Dictionary<string, string>
-        {
-            ["JWT_KEY_LENGTH"] = (Environment.GetEnvironmentVariable("JWT_KEY")?.Length ?? 0).ToString(),
-            ["JWT_ISSUER"] = Environment.GetEnvironmentVariable("JWT_ISSUER") ?? "No configurado",
-            ["JWT_AUDIENCE"] = Environment.GetEnvironmentVariable("JWT_AUDIENCE") ?? "No configurado",
-            ["JWT_SUBJECT"] = Environment.GetEnvironmentVariable("JWT_SUBJECT") ?? "No configurado",
-            ["DB_CONNECTION"] = "Configurado: " + (!string.IsNullOrEmpty(Environment.GetEnvironmentVariable("DATA_BASE_CONNECTION_STRING"))).ToString(),
-            ["ASPNETCORE_ENVIRONMENT"] = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") ?? "No configurado",
-            ["PORT"] = Environment.GetEnvironmentVariable("PORT") ?? "No configurado"
-        };
-        return Results.Ok(vars);
-    }
-    catch (Exception ex) {
-        return Results.Problem(ex.ToString());
-    }
-});
-
-app.MapGet("/api/diagnostico/db", async (MyDbContext db) => 
-{
-    try {
-        bool canConnect = false;
-        string errorMessage = "";
-        
-        try {
-            canConnect = await db.Database.CanConnectAsync();
-        }
-        catch (Exception ex) {
-            errorMessage = ex.Message;
-        }
-        
-        return Results.Ok(new { 
-            CanConnect = canConnect,
-            Error = errorMessage,
-            ConnectionString = "***HIDDEN***" // No mostrar la cadena de conexión completa por seguridad
-        });
-    }
-    catch (Exception ex) {
-        return Results.Problem(ex.ToString());
-    }
-});
-
-app.MapGet("/api/diagnostico/users", async (MyDbContext db) => 
-{
-    try {
-        var userCount = await db.Admins.CountAsync();
-        return Results.Ok(new { UserCount = userCount });
-    }
-    catch (Exception ex) {
-        return Results.Problem(ex.ToString());
-    }
-});
-
-app.MapGet("/api/diagnostico/auth", async (MyDbContext db) => 
-{
-    try {
-        var adminWithRoles = await db.Admins
-            .Include(a => a.Role)
-            .Select(a => new { 
-                a.Mail, 
-                RoleName = a.Role.Name,
-                RoleId = a.RolId 
-            })
-            .ToListAsync();
-
-        return Results.Ok(new { 
-            AdminCount = adminWithRoles.Count,
-            Admins = adminWithRoles
-        });
-    }
-    catch (Exception ex) {
-        return Results.Problem(new ProblemDetails {
-            Title = "Error al consultar admins",
-            Detail = ex.Message + "\n" + ex.InnerException?.Message,
-            Status = 500
-        });
-    }
-});
-
-app.MapGet("/api/diagnostico/connection", async () => 
-{
-    try {
-        var connectionString = Environment.GetEnvironmentVariable("DATA_BASE_CONNECTION_STRING");
-        var maskedConnectionString = "No configurado";
-        var pingResult = false;
-        var pingError = "";
-        var tcpTestResult = false;
-        var tcpTestError = "";
-
-        if (!string.IsNullOrEmpty(connectionString))
-        {
-            try {
-                var builder = new Microsoft.Data.SqlClient.SqlConnectionStringBuilder(connectionString);
-                var server = builder.DataSource.Split(',')[0];
-                var port = 1433; // Puerto por defecto de SQL Server
-                
-                // Test ICMP (ping)
-                using (var ping = new System.Net.NetworkInformation.Ping())
-                {
-                    var reply = await ping.SendPingAsync(server, 1000);
-                    pingResult = reply.Status == System.Net.NetworkInformation.IPStatus.Success;
-                    pingError = reply.Status.ToString();
-                }
-
-                // Test TCP
-                try {
-                    using (var tcpClient = new System.Net.Sockets.TcpClient())
-                    {
-                        await tcpClient.ConnectAsync(server, port);
-                        tcpTestResult = tcpClient.Connected;
-                    }
-                }
-                catch (Exception ex)
-                {
-                    tcpTestError = ex.Message;
-                }
-                
-                builder.Password = "***HIDDEN***";
-                maskedConnectionString = builder.ToString();
-            }
-            catch (Exception ex) {
-                maskedConnectionString = $"INVÁLIDA: {ex.Message}";
-            }
-        }
-        
-        return Results.Ok(new { 
-            ConnectionStringConfigured = !string.IsNullOrEmpty(connectionString),
-            MaskedConnectionString = maskedConnectionString,
-            ServerPingSuccess = pingResult,
-            PingStatus = pingError,
-            TcpTestSuccess = tcpTestResult,
-            TcpTestError = tcpTestError
-        });
-    }
-    catch (Exception ex) {
-        return Results.Problem(ex.ToString());
-    }
-});
-
 app.MapGet("/api/diagnostico/sqltest", async () => 
 {
     try {
@@ -382,24 +250,6 @@ app.MapGet("/api/diagnostico/sqltest", async () =>
     }
 });
 
-app.MapGet("/api/diagnostico/ip", async (HttpContext context) => 
-{
-    try {
-        // Obtener la IP del servidor
-        var hostName = System.Net.Dns.GetHostName();
-        var ips = await System.Net.Dns.GetHostAddressesAsync(hostName);
-        
-        return Results.Ok(new { 
-            HostName = hostName,
-            ServerIPs = ips.Select(ip => ip.ToString()).ToArray(),
-            ClientIP = context.Connection.RemoteIpAddress?.ToString()
-        });
-    }
-    catch (Exception ex) {
-        return Results.Problem(ex.ToString());
-    }
-});
-
 app.MapGet("/api/diagnostico/external-ip", async () => 
 {
     try {
@@ -417,20 +267,6 @@ app.MapGet("/api/diagnostico/external-ip", async () =>
         
         return Results.Ok(new { 
             ExternalIp = externalIp
-        });
-    }
-    catch (Exception ex) {
-        return Results.Problem(ex.ToString());
-    }
-});
-
-app.MapGet("/api/diagnostico/fallback-db", async () => 
-{
-    try {
-        // Intenta conectar a una base de datos de respaldo o simulada
-        return Results.Ok(new { 
-            Message = "Fallback database connection successful",
-            Timestamp = DateTime.UtcNow
         });
     }
     catch (Exception ex) {

@@ -8,6 +8,7 @@ using GIGANTECORE.Utils;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
+using BCrypt.Net;
 
 namespace GIGANTECORE.Controllers;
 
@@ -53,7 +54,7 @@ public class AuthController:ControllerBase
             }
 
             // Verificar contraseña
-            if (loginRequest.Password != admin.Password)
+            if (!BCrypt.Net.BCrypt.Verify(loginRequest.Password, admin.Password))
             {
                 _logger.LogError("Contraseña incorrecta.");
                 return Unauthorized("Credenciales inválidas.");

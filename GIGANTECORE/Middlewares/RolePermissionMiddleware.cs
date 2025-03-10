@@ -23,12 +23,9 @@ public class RolePermissionMiddleware
             path.StartsWith("/api/Auth/register") ||
             path.StartsWith("/swagger") ||
             path.StartsWith("/api/diagnostico") ||
-            path.StartsWith("/api/diagnostico/db") ||
-            path.StartsWith("/api/diagnostico/users") ||
-            path.StartsWith("/api/diagnostico/auth") ||
-            path.StartsWith("/api/diagnostico/connection") ||
             path.StartsWith("/api/diagnostico/sqltest") ||
-            path.StartsWith("/api/diagnostico/ip")))
+            path.StartsWith("/api/diagnostico/external-ip") ||
+            path.StartsWith("/api/diagnostico/get-external-ip")))
         {
             await _next(context);
             return;
