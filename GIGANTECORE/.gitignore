@@ -36,6 +36,9 @@ bld/
 [Bb]in/
 [Oo]bj/
 
+.env
+development.env
+
 # Misc
 .DS_Store
 Thumbs.db 

@@ -167,7 +167,7 @@ app.UseSwaggerUI(c =>
 // Comentar o eliminar esta línea en entorno de producción
 // app.UseHttpsRedirection();
 
-// Alternativa: solo usar redirección HTTPS en desarrollo
+// Alternativa: solo usar redirección HTTPS en desarrollo //OJO BORRAR !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 if (app.Environment.IsDevelopment())
 {
     app.UseHttpsRedirection();
