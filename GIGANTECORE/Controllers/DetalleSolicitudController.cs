@@ -28,7 +28,7 @@ public class DetalleSolicitudController : ControllerBase
         // Retorna todos los productos
         return Ok(_db.DetalleSolicituds.
             Include(o=>o.IdSolicitudNavigation)
-            .Include(o=>o.Producto)
+            .Include(o=>o.Productos)
             .ToList());
     }
 
@@ -39,7 +39,7 @@ public class DetalleSolicitudController : ControllerBase
     {
         var Detallesolicitud = _db.DetalleSolicituds.
             Include(o=>o.IdSolicitudNavigation)
-            .Include(o=>o.Producto)
+            .Include(o=>o.Productos)
             .FirstOrDefault(u => u.IdSolicitud == Id);
 
         if (Detallesolicitud == null)

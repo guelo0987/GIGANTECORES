@@ -16,11 +16,11 @@ public partial class MyDbContext : DbContext
     {
     }
 
-    public virtual DbSet<Admin> Admins { get; set; }
+    public virtual DbSet<admin> admin { get; set; }
 
-    public virtual DbSet<Carrito> Carritos { get; set; }
+    public virtual DbSet<banner> banner { get; set; }
 
-    public virtual DbSet<Categorium> Categoria { get; set; }
+    public virtual DbSet<categoria> categoria { get; set; }
 
     public virtual DbSet<Compañium> Compañia { get; set; }
 
@@ -28,48 +28,55 @@ public partial class MyDbContext : DbContext
 
     public virtual DbSet<HistorialCorreo> HistorialCorreos { get; set; }
 
-    public virtual DbSet<Producto> Productos { get; set; }
+    public virtual DbSet<productos> productos { get; set; }
+
+    public virtual DbSet<roles> roles { get; set; }
+
+    public virtual DbSet<rolepermisos> rolepermisos { get; set; }
 
     public virtual DbSet<Solicitud> Solicituds { get; set; }
 
-    public virtual DbSet<SubCategorium> SubCategoria { get; set; }
+    public virtual DbSet<subcategoria> subcategoria { get; set; }
 
-    public virtual DbSet<UsuarioCliente> UsuarioClientes { get; set; }
-
-    public virtual DbSet<RolePermiso> RolePermisos { get; set; }
-
-    public virtual DbSet<Banner> Banners { get; set; }
-
-    public virtual DbSet<Roles> Roles { get; set; }
+    public virtual DbSet<usuario_cliente> usuario_cliente { get; set; }
     
-    public virtual DbSet<Vacantes> Vacantes { get; set; }
+    public virtual DbSet<Carrito> Carrito { get; set; }
+
+    public virtual DbSet<vacantes> vacantes { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
-        modelBuilder.Entity<Roles>(entity =>
+        base.OnModelCreating(modelBuilder);
+        
+        // Set PostgreSQL conventions - lowercase table names
+        foreach (var entity in modelBuilder.Model.GetEntityTypes())
         {
-            entity.HasKey(e => e.IdRol);
-            entity.Property(e => e.Name).HasMaxLength(50).IsRequired();
-        });
-
-        modelBuilder.Entity<Admin>(entity =>
+            entity.SetTableName(entity.GetTableName().ToLower());
+            
+            // Use snake_case naming convention for PostgreSQL columns
+            foreach (var property in entity.GetProperties())
+            {
+                property.SetColumnName(property.GetColumnName().ToLower());
+            }
+        }
+        
+        modelBuilder.Entity<admin>(entity =>
         {
-            entity.HasKey(e => e.Id).HasName("PK__Admin__3214EC07A4E8858C");
+            entity.ToTable("admin");
+            entity.HasKey(e => e.Id).HasName("PK_admin");
 
-            entity.ToTable("Admin");
+            entity.HasIndex(e => e.RolId, "IX_Admin_RolId");
 
             entity.Property(e => e.FechaIngreso)
-                .HasDefaultValueSql("(getdate())")
-                .HasColumnType("datetime");
+                .HasDefaultValueSql("now()")
+                .HasColumnType("timestamp");
             entity.Property(e => e.Mail).HasMaxLength(100);
             entity.Property(e => e.Nombre).HasMaxLength(100);
             entity.Property(e => e.Password).HasMaxLength(100);
-            entity.Property(e => e.RolId).IsRequired(false);
             entity.Property(e => e.SoloLectura).HasDefaultValue(false);
             entity.Property(e => e.Telefono).HasMaxLength(20);
 
-            entity.HasOne(d => d.Role)
-                .WithMany(p => p.Admins)
+            entity.HasOne(d => d.Role).WithMany(p => p.Admins)
                 .HasForeignKey(d => d.RolId)
                 .OnDelete(DeleteBehavior.SetNull);
         });
@@ -84,7 +91,7 @@ public partial class MyDbContext : DbContext
 
             entity.HasIndex(e => e.UsuarioId, "IX_Carrito_UsuarioId");
 
-            entity.HasOne(d => d.Producto).WithMany(p => p.Carritos)
+            entity.HasOne(d => d.Productos).WithMany(p => p.Carritos)
                 .HasForeignKey(d => d.ProductoId)
                 .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("FK__Carrito__Product__6C190EBB");
@@ -95,7 +102,7 @@ public partial class MyDbContext : DbContext
                 .HasConstraintName("FK__Carrito__Usuario__46E78A0C");
         });
 
-        modelBuilder.Entity<Categorium>(entity =>
+        modelBuilder.Entity<categoria>(entity =>
         {
             entity.HasKey(e => e.Id).HasName("PK__Categori__3214EC07791AF110");
 
@@ -127,7 +134,7 @@ public partial class MyDbContext : DbContext
                 .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("FK__DetalleSo__IdSol__4D94879B");
 
-            entity.HasOne(d => d.Producto).WithMany(p => p.DetalleSolicituds)
+            entity.HasOne(d => d.Productos).WithMany(p => p.DetalleSolicituds)
                 .HasForeignKey(d => d.ProductoId)
                 .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("FK__DetalleSo__Produ__6D0D32F4");
@@ -164,8 +171,7 @@ public partial class MyDbContext : DbContext
                 .HasConstraintName("FK__HistorialCorreo__UsuarioId");
         });
 
-
-        modelBuilder.Entity<Producto>(entity =>
+        modelBuilder.Entity<productos>(entity =>
         {
             entity.HasKey(e => e.Codigo).HasName("PK__tmp_ms_x__06370DAD53EE836F");
 
@@ -207,7 +213,7 @@ public partial class MyDbContext : DbContext
                 .HasConstraintName("FK__Solicitud__Usuar__4AB81AF0");
         });
 
-        modelBuilder.Entity<SubCategorium>(entity =>
+        modelBuilder.Entity<subcategoria>(entity =>
         {
             entity.HasKey(e => e.Id).HasName("PK__SubCateg__3214EC079C3939DB");
 
@@ -221,7 +227,7 @@ public partial class MyDbContext : DbContext
                 .HasConstraintName("FK__SubCatego__Categ__3F466844");
         });
 
-        modelBuilder.Entity<UsuarioCliente>(entity =>
+        modelBuilder.Entity<usuario_cliente>(entity =>
         {
             entity.HasKey(e => e.Id).HasName("PK__UsuarioC__3214EC07D79F99F6");
 
@@ -254,7 +260,7 @@ public partial class MyDbContext : DbContext
                 .OnDelete(DeleteBehavior.Restrict);
         });
 
-        modelBuilder.Entity<RolePermiso>(entity =>
+        modelBuilder.Entity<rolepermisos>(entity =>
         {
             entity.HasKey(e => e.IdPermiso);
             entity.Property(e => e.RoleId).IsRequired();
@@ -285,11 +291,11 @@ public partial class MyDbContext : DbContext
                 throw new InvalidOperationException("La cadena de conexión no está configurada");
             }
             
-            optionsBuilder.UseSqlServer(connectionString, options => 
+            optionsBuilder.UseNpgsql(connectionString, options => 
                 options.EnableRetryOnFailure(
                     maxRetryCount: 5,
                     maxRetryDelay: TimeSpan.FromSeconds(30),
-                    errorNumbersToAdd: null)
+                    errorCodesToAdd: null)
             );
         }
     }

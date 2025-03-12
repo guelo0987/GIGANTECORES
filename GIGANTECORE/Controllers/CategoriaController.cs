@@ -35,13 +35,13 @@ public class CategoriaController:ControllerBase
     [HttpGet]
     public async Task<IActionResult> GetCategorias()
     {
-        return Ok(await _db.Categoria.ToListAsync());
+        return Ok(await _db.categoria.ToListAsync());
     }
     
     [HttpGet("{id}")]
     public async Task<IActionResult> GetCategoriaId(int id)
     {
-        var categorium = await _db.Categoria
+        var categorium = await _db.categoria
             .FirstOrDefaultAsync(u => u.Id == id);
 
         if (categorium == null)
@@ -72,7 +72,7 @@ public class CategoriaController:ControllerBase
         if (categoria.Id > 0) // Actualizar categoría existente
         {
             // Buscar la categoría por ID
-            var existingCategoria = await _db.Categoria.FirstOrDefaultAsync(c => c.Id == categoria.Id);
+            var existingCategoria = await _db.categoria.FirstOrDefaultAsync(c => c.Id == categoria.Id);
 
             if (existingCategoria == null)
             {
@@ -80,7 +80,7 @@ public class CategoriaController:ControllerBase
             }
 
             // Verificar si el nuevo nombre ya existe en otra categoría (case insensitive)
-            if (await _db.Categoria.AnyAsync(c => c.Id != categoria.Id && c.Nombre.ToLower() == categoria.Nombre.ToLower()))
+            if (await _db.categoria.AnyAsync(c => c.Id != categoria.Id && c.Nombre.ToLower() == categoria.Nombre.ToLower()))
             {
                 return Conflict(new { Message = $"Ya existe otra categoría con el nombre '{categoria.Nombre}'." });
             }
@@ -94,18 +94,18 @@ public class CategoriaController:ControllerBase
         else // Crear nueva categoría
         {
             // Verificar si ya existe una categoría con el mismo nombre
-            if (await _db.Categoria.AnyAsync(c => c.Nombre.ToLower() == categoria.Nombre.ToLower()))
+            if (await _db.categoria.AnyAsync(c => c.Nombre.ToLower() == categoria.Nombre.ToLower()))
             {
                 return Conflict(new { Message = $"Ya existe una categoría con el nombre '{categoria.Nombre}'." });
             }
 
             // Crear nueva categoría
-            var newCategoria = new Categorium
+            var newCategoria = new categoria
             {
                 Nombre = categoria.Nombre
             };
 
-            _db.Categoria.Add(newCategoria);
+            _db.categoria.Add(newCategoria);
             await _db.SaveChangesAsync();
 
             return Ok(new { Message = "Categoría creada exitosamente.", Categoria = newCategoria });
@@ -117,14 +117,14 @@ public class CategoriaController:ControllerBase
     public async Task<IActionResult> DeleteCategoria(int id)
     {
         // Buscar la categoría existente
-        var categoria = await _db.Categoria.FirstOrDefaultAsync(c => c.Id == id);
+        var categoria = await _db.categoria.FirstOrDefaultAsync(c => c.Id == id);
         if (categoria == null)
         {
             return NotFound(new { Message = "La categoría no fue encontrada." });
         }
 
         // Eliminar la categoría
-        _db.Categoria.Remove(categoria);
+        _db.categoria.Remove(categoria);
         await _db.SaveChangesAsync();
 
         return Ok(new { Message = "Categoría eliminada exitosamente." });

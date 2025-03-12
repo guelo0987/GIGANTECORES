@@ -15,7 +15,7 @@ public partial class DetalleSolicitud
 
     public virtual Solicitud IdSolicitudNavigation { get; set; } = null!;
 
-    public virtual Producto Producto { get; set; } = null!;
+    public virtual productos Productos { get; set; } = null!;
 
     public virtual ICollection<HistorialCorreo> HistorialCorreos { get; set; } = new List<HistorialCorreo>();
 }

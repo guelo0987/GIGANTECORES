@@ -13,7 +13,7 @@ public partial class Carrito
 
     public int Cantidad { get; set; }
 
-    public virtual Producto Producto { get; set; } = null!;
+    public virtual productos Productos { get; set; } = null!;
 
-    public virtual UsuarioCliente Usuario { get; set; } = null!;
+    public virtual usuario_cliente Usuario { get; set; } = null!;
 }

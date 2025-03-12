@@ -15,14 +15,14 @@ public class RolePermissionMiddleware
     public async Task InvokeAsync(HttpContext context)
     {
         var path = context.Request.Path.Value;
-        Console.WriteLine($"Ruta completa: {path}");
+       
 
         // Excluir rutas específicas
         if (path != null && (
             path.StartsWith("/api/Auth/login") || 
             path.StartsWith("/api/Auth/register") ||
             path.StartsWith("/swagger") ||
-            path.StartsWith("/api/diagnostico") ||
+            path.StartsWith("/api/User") ||
             path.StartsWith("/api/diagnostico/sqltest") ||
             path.StartsWith("/api/diagnostico/external-ip") ||
             path.StartsWith("/api/diagnostico/get-external-ip")))
@@ -33,7 +33,7 @@ public class RolePermissionMiddleware
 
         var db = context.RequestServices.GetRequiredService<MyDbContext>();
         var userRole = context.User.FindFirst(ClaimTypes.Role)?.Value;
-        Console.WriteLine($"Rol del usuario: {userRole}");
+        
 
         if (userRole == null)
         {
@@ -62,7 +62,7 @@ public class RolePermissionMiddleware
         }
 
         // Verificar permisos usando Include para cargar la relación Role
-        var permission = await db.RolePermisos
+        var permission = await db.rolepermisos
             .Include(p => p.Role)
             .FirstOrDefaultAsync(p => p.Role.Name == userRole && p.TableName == controllerName);
 

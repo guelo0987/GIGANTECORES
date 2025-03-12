@@ -3,35 +3,35 @@ using System;
 using GIGANTECORE.Context;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
-using Microsoft.EntityFrameworkCore.Metadata;
 using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
+using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
 #nullable disable
 
-namespace GIGANTECORE.Migrations
+namespace GIGANTECORE.Models
 {
     [DbContext(typeof(MyDbContext))]
-    [Migration("20250205212335_RoleUpdate")]
-    partial class RoleUpdate
+    [Migration("20250312212322_SkipExistingSchema")]
+    partial class SkipExistingSchema
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "9.0.0")
-                .HasAnnotation("Relational:MaxIdentifierLength", 128);
+                .HasAnnotation("ProductVersion", "8.0.0")
+                .HasAnnotation("Relational:MaxIdentifierLength", 63);
 
-            SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
+            NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
 
             modelBuilder.Entity("GIGANTECORE.Models.Admin", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
                     b.Property<DateTime?>("FechaIngreso")
                         .ValueGeneratedOnAdd()
@@ -41,29 +41,29 @@ namespace GIGANTECORE.Migrations
                     b.Property<string>("Mail")
                         .IsRequired()
                         .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)");
+                        .HasColumnType("character varying(100)");
 
                     b.Property<string>("Nombre")
                         .IsRequired()
                         .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)");
+                        .HasColumnType("character varying(100)");
 
                     b.Property<string>("Password")
                         .IsRequired()
                         .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)");
+                        .HasColumnType("character varying(100)");
 
                     b.Property<int?>("RolId")
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
 
                     b.Property<bool?>("SoloLectura")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("bit")
+                        .HasColumnType("boolean")
                         .HasDefaultValue(false);
 
                     b.Property<string>("Telefono")
                         .HasMaxLength(20)
-                        .HasColumnType("nvarchar(20)");
+                        .HasColumnType("character varying(20)");
 
                     b.HasKey("Id")
                         .HasName("PK__Admin__3214EC07A4E8858C");
@@ -77,22 +77,22 @@ namespace GIGANTECORE.Migrations
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
                     b.Property<bool>("Active")
-                        .HasColumnType("bit");
+                        .HasColumnType("boolean");
 
                     b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("datetime2");
+                        .HasColumnType("timestamp with time zone");
 
                     b.Property<string>("ImageUrl")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("text");
 
                     b.Property<int>("OrderIndex")
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
 
                     b.HasKey("Id");
 
@@ -103,18 +103,18 @@ namespace GIGANTECORE.Migrations
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
                     b.Property<int>("Cantidad")
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
 
                     b.Property<int>("ProductoId")
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
 
                     b.Property<int>("UsuarioId")
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
 
                     b.HasKey("Id")
                         .HasName("PK__Carrito__3214EC0784CC7F99");
@@ -130,14 +130,14 @@ namespace GIGANTECORE.Migrations
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
                     b.Property<string>("Nombre")
                         .IsRequired()
                         .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)");
+                        .HasColumnType("character varying(100)");
 
                     b.HasKey("Id")
                         .HasName("PK__Categori__3214EC07791AF110");
@@ -149,13 +149,13 @@ namespace GIGANTECORE.Migrations
                 {
                     b.Property<string>("Rnc")
                         .HasMaxLength(11)
-                        .HasColumnType("nvarchar(11)")
+                        .HasColumnType("character varying(11)")
                         .HasColumnName("RNC");
 
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)");
+                        .HasColumnType("character varying(100)");
 
                     b.HasKey("Rnc")
                         .HasName("PK__Compañia__CAFF6951C669784F");
@@ -167,18 +167,18 @@ namespace GIGANTECORE.Migrations
                 {
                     b.Property<int>("IdDetalle")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("IdDetalle"));
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("IdDetalle"));
 
                     b.Property<int>("Cantidad")
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
 
                     b.Property<int>("IdSolicitud")
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
 
                     b.Property<int>("ProductoId")
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
 
                     b.HasKey("IdDetalle")
                         .HasName("PK__DetalleS__E43646A58EBFD1A7");
@@ -194,17 +194,17 @@ namespace GIGANTECORE.Migrations
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
                     b.Property<int>("DetalleSolicitudId")
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
 
                     b.Property<string>("Estado")
                         .ValueGeneratedOnAdd()
                         .HasMaxLength(20)
-                        .HasColumnType("nvarchar(20)")
+                        .HasColumnType("character varying(20)")
                         .HasDefaultValue("Enviado");
 
                     b.Property<DateTime?>("FechaEnvio")
@@ -213,7 +213,7 @@ namespace GIGANTECORE.Migrations
                         .HasDefaultValueSql("(getdate())");
 
                     b.Property<int>("UsuarioId")
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
 
                     b.HasKey("Id")
                         .HasName("PK__Historia__3214EC0765966D64");
@@ -228,31 +228,40 @@ namespace GIGANTECORE.Migrations
             modelBuilder.Entity("GIGANTECORE.Models.Producto", b =>
                 {
                     b.Property<int>("Codigo")
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
 
                     b.Property<int?>("CategoriaId")
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
+
+                    b.Property<string>("Descripcion")
+                        .HasColumnType("text");
+
+                    b.Property<bool?>("EsDestacado")
+                        .HasColumnType("boolean");
 
                     b.Property<string>("ImageUrl")
                         .HasMaxLength(255)
-                        .HasColumnType("nvarchar(255)");
+                        .HasColumnType("character varying(255)");
 
                     b.Property<string>("Marca")
                         .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)");
+                        .HasColumnType("character varying(50)");
+
+                    b.Property<string>("Medidas")
+                        .HasColumnType("text");
 
                     b.Property<string>("Nombre")
                         .IsRequired()
                         .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)");
+                        .HasColumnType("character varying(100)");
 
                     b.Property<bool?>("Stock")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("bit")
+                        .HasColumnType("boolean")
                         .HasDefaultValue(true);
 
                     b.Property<int>("SubCategoriaId")
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
 
                     b.HasKey("Codigo")
                         .HasName("PK__tmp_ms_x__06370DAD53EE836F");
@@ -268,29 +277,29 @@ namespace GIGANTECORE.Migrations
                 {
                     b.Property<int>("IdPermiso")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("IdPermiso"));
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("IdPermiso"));
 
                     b.Property<bool>("CanCreate")
-                        .HasColumnType("bit");
+                        .HasColumnType("boolean");
 
                     b.Property<bool>("CanDelete")
-                        .HasColumnType("bit");
+                        .HasColumnType("boolean");
 
                     b.Property<bool>("CanRead")
-                        .HasColumnType("bit");
+                        .HasColumnType("boolean");
 
                     b.Property<bool>("CanUpdate")
-                        .HasColumnType("bit");
+                        .HasColumnType("boolean");
 
                     b.Property<int>("RoleId")
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
 
                     b.Property<string>("TableName")
                         .IsRequired()
                         .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)");
+                        .HasColumnType("character varying(100)");
 
                     b.HasKey("IdPermiso");
 
@@ -303,14 +312,14 @@ namespace GIGANTECORE.Migrations
                 {
                     b.Property<int>("IdRol")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("IdRol"));
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("IdRol"));
 
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)");
+                        .HasColumnType("character varying(50)");
 
                     b.HasKey("IdRol");
 
@@ -321,9 +330,9 @@ namespace GIGANTECORE.Migrations
                 {
                     b.Property<int>("IdSolicitud")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("IdSolicitud"));
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("IdSolicitud"));
 
                     b.Property<DateTime?>("FechaSolicitud")
                         .ValueGeneratedOnAdd()
@@ -331,7 +340,7 @@ namespace GIGANTECORE.Migrations
                         .HasDefaultValueSql("(getdate())");
 
                     b.Property<int>("UsuarioId")
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
 
                     b.HasKey("IdSolicitud")
                         .HasName("PK__Solicitu__36899CEF05DB70D6");
@@ -345,17 +354,17 @@ namespace GIGANTECORE.Migrations
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
                     b.Property<int>("CategoriaId")
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
 
                     b.Property<string>("Nombre")
                         .IsRequired()
                         .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)");
+                        .HasColumnType("character varying(100)");
 
                     b.HasKey("Id")
                         .HasName("PK__SubCateg__3214EC079C3939DB");
@@ -369,21 +378,21 @@ namespace GIGANTECORE.Migrations
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
                     b.Property<string>("Apellidos")
                         .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)");
+                        .HasColumnType("character varying(100)");
 
                     b.Property<string>("Ciudad")
                         .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)");
+                        .HasColumnType("character varying(100)");
 
                     b.Property<string>("Direccion")
                         .HasMaxLength(200)
-                        .HasColumnType("nvarchar(200)");
+                        .HasColumnType("character varying(200)");
 
                     b.Property<DateOnly?>("Dob")
                         .HasColumnType("date")
@@ -392,7 +401,7 @@ namespace GIGANTECORE.Migrations
                     b.Property<string>("Email")
                         .IsRequired()
                         .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)");
+                        .HasColumnType("character varying(100)");
 
                     b.Property<DateTime?>("FechaIngreso")
                         .ValueGeneratedOnAdd()
@@ -401,20 +410,20 @@ namespace GIGANTECORE.Migrations
 
                     b.Property<string>("Rnc")
                         .HasMaxLength(11)
-                        .HasColumnType("nvarchar(11)")
+                        .HasColumnType("character varying(11)")
                         .HasColumnName("RNC");
 
                     b.Property<int>("RolId")
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
 
                     b.Property<string>("Telefono")
                         .HasMaxLength(20)
-                        .HasColumnType("nvarchar(20)");
+                        .HasColumnType("character varying(20)");
 
                     b.Property<string>("UserName")
                         .IsRequired()
                         .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)");
+                        .HasColumnType("character varying(50)");
 
                     b.HasKey("Id")
                         .HasName("PK__UsuarioC__3214EC07D79F99F6");
@@ -424,6 +433,69 @@ namespace GIGANTECORE.Migrations
                     b.HasIndex(new[] { "Rnc" }, "IX_UsuarioCliente_RNC");
 
                     b.ToTable("UsuarioCliente", (string)null);
+                });
+
+            modelBuilder.Entity("GIGANTECORE.Models.Vacantes", b =>
+                {
+                    b.Property<int>("id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("id"));
+
+                    b.Property<int?>("AnosExperiencia")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("Correo")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("CurriculumUrl")
+                        .HasColumnType("text");
+
+                    b.Property<DateTime>("FechaAplicacion")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("FuncionLaboral")
+                        .HasColumnType("text");
+
+                    b.Property<string>("NivelAcademico")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("NivelLaboral")
+                        .HasColumnType("text");
+
+                    b.Property<string>("OtraFuncionLaboral")
+                        .HasColumnType("text");
+
+                    b.Property<string>("OtroNivelLaboral")
+                        .HasColumnType("text");
+
+                    b.Property<decimal?>("UltimoSalario")
+                        .HasColumnType("numeric");
+
+                    b.Property<string>("cedula")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("estado")
+                        .HasColumnType("text");
+
+                    b.Property<string>("nombre")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<char>("sexo")
+                        .HasColumnType("character(1)");
+
+                    b.Property<string>("telefono")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.HasKey("id");
+
+                    b.ToTable("Vacantes");
                 });
 
             modelBuilder.Entity("GIGANTECORE.Models.Admin", b =>

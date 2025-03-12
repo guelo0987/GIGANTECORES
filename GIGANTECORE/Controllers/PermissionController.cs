@@ -26,7 +26,7 @@ public class PermissionController : ControllerBase
     [HttpGet]
     public IActionResult GetPermissions()
     {
-        var permissions = _db.RolePermisos
+        var permissions = _db.rolepermisos
             .Include(p => p.Role)
             .ToList();
         return Ok(permissions);
@@ -35,13 +35,13 @@ public class PermissionController : ControllerBase
     [HttpPost]
     public IActionResult AddOrUpdatePermission([FromBody] RolePermissionDTO permission)
     {
-        var role = _db.Roles.FirstOrDefault(r => r.Name == permission.Role);
+        var role = _db.roles.FirstOrDefault(r => r.Name == permission.Role);
         if (role == null)
         {
             return NotFound($"Role '{permission.Role}' not found");
         }
 
-        var existingPermission = _db.RolePermisos
+        var existingPermission = _db.rolepermisos
             .Include(p => p.Role)
             .FirstOrDefault(p => p.Role.Name == permission.Role && p.TableName == permission.TableName);
 
@@ -54,7 +54,7 @@ public class PermissionController : ControllerBase
         }
         else
         {
-            var newPermission = new RolePermiso
+            var newPermission = new rolepermisos
             {
                 RoleId = role.IdRol,
                 TableName = permission.TableName,
@@ -64,7 +64,7 @@ public class PermissionController : ControllerBase
                 CanUpdate = permission.CanUpdate
             };
             
-            _db.RolePermisos.Add(newPermission);
+            _db.rolepermisos.Add(newPermission);
         }
 
         _db.SaveChanges();

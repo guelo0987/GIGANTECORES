@@ -23,7 +23,7 @@ namespace GIGANTECORE.Controllers
         [HttpGet]
         public async Task<IActionResult> GetAllVacantes()
         {
-            var vacantes = await _db.Vacantes.ToListAsync();
+            var vacantes = await _db.vacantes.ToListAsync();
             return Ok(vacantes);
         }
 
@@ -32,7 +32,7 @@ namespace GIGANTECORE.Controllers
         [HttpGet("{id}")]
         public async Task<IActionResult> GetVacanteById(int id)
         {
-            var vacante = await _db.Vacantes.FirstOrDefaultAsync(v => v.id == id);
+            var vacante = await _db.vacantes.FirstOrDefaultAsync(v => v.id == id);
             if (vacante == null)
             {
                 _logger.LogError("Vacante con Id {Id} no encontrada", id);
@@ -52,7 +52,7 @@ namespace GIGANTECORE.Controllers
             [FromQuery] string nivelAcademico,
             [FromQuery] string funcionLaboral)
         {
-            var query = _db.Vacantes.AsQueryable();
+            var query = _db.vacantes.AsQueryable();
             
             if (!string.IsNullOrEmpty(nombre))
                 query = query.Where(v => v.nombre.Contains(nombre));
@@ -82,7 +82,7 @@ namespace GIGANTECORE.Controllers
         }
         
         // Método privado para mapear de Vacante a VacanteDto
-        private VacanteDto MapToDto(Vacantes vacante)
+        private VacanteDto MapToDto(vacantes vacante)
         {
             return new VacanteDto
             {

@@ -17,5 +17,5 @@ public partial class HistorialCorreo
 
     public virtual DetalleSolicitud DetalleSolicitud { get; set; } = null!;
 
-    public virtual UsuarioCliente Usuario { get; set; } = null!;
+    public virtual usuario_cliente Usuario { get; set; } = null!;
 }

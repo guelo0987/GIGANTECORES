@@ -55,21 +55,35 @@ public class AdminMultiMedia
                     stream);
             }
 
-            var banner = new Banner
+            int newOrderIndex = 1;
+            try {
+                newOrderIndex = _context.banner.Max(b => (int?)b.OrderIndex) + 1 ?? 1;
+            }
+            catch {
+                // Si hay algún error, usar 1 como valor predeterminado
+            }
+
+            var banner = new banner()
             {
                 ImageUrl = fileName,
                 Active = true,
-                OrderIndex = _context.Banners.Max(b => (int?)b.OrderIndex) + 1 ?? 1
+                OrderIndex = newOrderIndex,
+                CreatedAt = DateTime.UtcNow
             };
 
-            _context.Banners.Add(banner);
+            _context.banner.Add(banner);
             await _context.SaveChangesAsync();
 
             return new { success = true, fileName = fileName };
         }
         catch (Exception ex)
         {
-            return new { success = false, message = $"Error al subir archivo: {ex.Message}" };
+            string errorMessage = ex.Message;
+            if (ex.InnerException != null)
+            {
+                errorMessage += $" Inner exception: {ex.InnerException.Message}";
+            }
+            return new { success = false, message = $"Error al subir archivo: {errorMessage}" };
         }
     }
 
@@ -77,13 +91,13 @@ public class AdminMultiMedia
     {
         try
         {
-            var banner = await _context.Banners.FindAsync(id);
+            var banner = await _context.banner.FindAsync(id);
             if (banner == null) return false;
 
             var storageClient = await StorageClient.CreateAsync();
             await storageClient.DeleteObjectAsync(_bucketName, banner.ImageUrl);
 
-            _context.Banners.Remove(banner);
+            _context.banner.Remove(banner);
             await _context.SaveChangesAsync();
 
             return true;
@@ -111,7 +125,7 @@ public class AdminMultiMedia
         {
             foreach (var (id, newOrder) in newOrders)
             {
-                var banner = _context.Banners.Find(id);
+                var banner = _context.banner.Find(id);
                 if (banner != null)
                 {
                     banner.OrderIndex = newOrder;
@@ -127,9 +141,9 @@ public class AdminMultiMedia
         }
     }
 
-    public List<Banner> GetImages()
+    public List<banner> GetImages()
     {
-        return _context.Banners
+        return _context.banner
             .OrderBy(b => b.OrderIndex)
             .ToList();
     }
@@ -138,7 +152,7 @@ public class AdminMultiMedia
     {
         try
         {
-            var banner = _context.Banners.Find(id);
+            var banner = _context.banner.Find(id);
             if (banner == null) return false;
 
             banner.Active = !banner.Active;

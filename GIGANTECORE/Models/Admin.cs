@@ -4,7 +4,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace GIGANTECORE.Models;
 
-public partial class Admin
+public partial class admin
 {
     public int Id { get; set; }
 
@@ -16,7 +16,7 @@ public partial class Admin
 
     [ForeignKey("Role")]
     public int? RolId { get; set; }
-    public virtual Roles? Role { get; set; }
+    public virtual roles? Role { get; set; }
 
     public DateTime? FechaIngreso { get; set; }
 

@@ -4,7 +4,7 @@ using System.ComponentModel.DataAnnotations;
 
 namespace GIGANTECORE.Models;
 
-public partial class Producto
+public partial class productos
 {
     public int Codigo { get; set; }
 
@@ -28,9 +28,9 @@ public partial class Producto
     public string? Medidas { get; set; }
     public virtual ICollection<Carrito> Carritos { get; set; } = new List<Carrito>();
 
-    public virtual Categorium? Categoria { get; set; }
+    public virtual categoria? Categoria { get; set; }
 
     public virtual ICollection<DetalleSolicitud> DetalleSolicituds { get; set; } = new List<DetalleSolicitud>();
 
-    public virtual SubCategorium SubCategoria { get; set; } = null!;
+    public virtual subcategoria SubCategoria { get; set; } = null!;
 }

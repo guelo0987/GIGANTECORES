@@ -13,5 +13,5 @@ public partial class Solicitud
 
     public virtual ICollection<DetalleSolicitud> DetalleSolicituds { get; set; } = new List<DetalleSolicitud>();
 
-    public virtual UsuarioCliente Usuario { get; set; } = null!;
+    public virtual usuario_cliente Usuario { get; set; } = null!;
 }

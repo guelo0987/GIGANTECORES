@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace GIGANTECORE.Models;
 
-public partial class SubCategorium
+public partial class subcategoria
 {
     public int Id { get; set; }
 
@@ -11,7 +11,7 @@ public partial class SubCategorium
 
     public int CategoriaId { get; set; }
 
-    public virtual Categorium Categoria { get; set; } = null!;
+    public virtual categoria Categoria { get; set; } = null!;
 
-    public virtual ICollection<Producto> Productos { get; set; } = new List<Producto>();
+    public virtual ICollection<productos> Productos { get; set; } = new List<productos>();
 }

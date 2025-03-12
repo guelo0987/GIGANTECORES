@@ -2,10 +2,10 @@
 
 #nullable disable
 
-namespace GIGANTECORE.Migrations
+namespace GIGANTECORE.Models
 {
     /// <inheritdoc />
-    public partial class InitialDenuevo : Migration
+    public partial class SkipExistingSchema : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)

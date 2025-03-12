@@ -3,7 +3,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace GIGANTECORE.Models;
 
-public partial class RolePermiso
+public partial class rolepermisos
 {
     [Key]
     [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
@@ -11,7 +11,7 @@ public partial class RolePermiso
     
     [ForeignKey("Role")]
     public int RoleId { get; set; }
-    public virtual Roles Role { get; set; } = null!;
+    public virtual roles Role { get; set; } = null!;
     
     [Required]
     [StringLength(100)]

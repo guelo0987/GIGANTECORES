@@ -4,7 +4,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace GIGANTECORE.Models;
 
-public partial class UsuarioCliente
+public partial class usuario_cliente
 {
     public int Id { get; set; }
 
@@ -28,7 +28,7 @@ public partial class UsuarioCliente
 
     [ForeignKey("Role")]
     public int RolId { get; set; }
-    public virtual Roles Role { get; set; } = null!;
+    public virtual roles Role { get; set; } = null!;
 
     public virtual ICollection<Carrito> Carritos { get; set; } = new List<Carrito>();
 

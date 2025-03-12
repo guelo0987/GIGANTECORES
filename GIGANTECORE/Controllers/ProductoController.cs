@@ -31,7 +31,7 @@ public class ProductoController : ControllerBase
     [HttpGet]
     public async Task<IActionResult> GetProductos()
     {
-        return Ok(await _db.Productos.ToListAsync());
+        return Ok(await _db.productos.ToListAsync());
     }
     
     
@@ -39,7 +39,7 @@ public class ProductoController : ControllerBase
     [HttpGet("{codigo}")]
     public async Task<IActionResult> GetProductoId(int codigo)
     {
-        var producto = await _db.Productos
+        var producto = await _db.productos
             .FirstOrDefaultAsync(u => u.Codigo == codigo);
 
         if (producto == null)
@@ -64,7 +64,7 @@ public class ProductoController : ControllerBase
             return BadRequest(new { Message = "Los datos del producto son obligatorios." });
         }
         
-        var existingProducto = await _db.Productos.FirstOrDefaultAsync(p => p.Codigo == producto.Codigo);
+        var existingProducto = await _db.productos.FirstOrDefaultAsync(p => p.Codigo == producto.Codigo);
 
         if (existingProducto != null)
         {
@@ -95,7 +95,7 @@ public class ProductoController : ControllerBase
         }
         else
         {
-            if (await _db.Productos.AnyAsync(p => p.Nombre.ToLower() == producto.Nombre.ToLower()))
+            if (await _db.productos.AnyAsync(p => p.Nombre.ToLower() == producto.Nombre.ToLower()))
             {
                 return Conflict(new { Message = $"Ya existe un producto con el nombre '{producto.Nombre}'." });
             }
@@ -114,7 +114,7 @@ public class ProductoController : ControllerBase
                 }
             }
 
-            var newProducto = new Producto
+            var newProducto = new productos
             {
                 Codigo = producto.Codigo,
                 Nombre = producto.Nombre,
@@ -128,7 +128,7 @@ public class ProductoController : ControllerBase
                 Medidas = producto.Medidas
             };
 
-            await _db.Productos.AddAsync(newProducto);
+            await _db.productos.AddAsync(newProducto);
             await _db.SaveChangesAsync();
 
             return Ok(new { Message = "Producto creado exitosamente.", Producto = newProducto });
@@ -146,7 +146,7 @@ public class ProductoController : ControllerBase
     [HttpDelete("{codigo}")]
     public async Task<IActionResult> DeleteProducto(int codigo)
     {
-        var producto = await _db.Productos.FirstOrDefaultAsync(p => p.Codigo == codigo);
+        var producto = await _db.productos.FirstOrDefaultAsync(p => p.Codigo == codigo);
         if (producto == null)
         {
             return NotFound(new { Message = "El producto no fue encontrado." });
@@ -154,7 +154,7 @@ public class ProductoController : ControllerBase
 
         await _adminProductoMedia.Delete(producto.ImageUrl);
 
-        _db.Productos.Remove(producto);
+        _db.productos.Remove(producto);
         await _db.SaveChangesAsync();
 
         return Ok(new { Message = "Producto eliminado exitosamente." });

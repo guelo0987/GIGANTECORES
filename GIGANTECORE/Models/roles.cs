@@ -3,7 +3,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace GIGANTECORE.Models;
 
-public partial class Roles
+public partial class roles
 {
     [Key]
     [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
@@ -13,7 +13,7 @@ public partial class Roles
     [StringLength(50)]
     public string Name { get; set; } = null!;
     
-    public virtual ICollection<Admin> Admins { get; set; } = new List<Admin>();
-    public virtual ICollection<UsuarioCliente> UsuarioClientes { get; set; } = new List<UsuarioCliente>();
-    public virtual ICollection<RolePermiso> RolePermisos { get; set; } = new List<RolePermiso>();
+    public virtual ICollection<admin> Admins { get; set; } = new List<admin>();
+    public virtual ICollection<usuario_cliente> UsuarioClientes { get; set; } = new List<usuario_cliente>();
+    public virtual ICollection<rolepermisos> RolePermisos { get; set; } = new List<rolepermisos>();
 }

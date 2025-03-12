@@ -19,9 +19,7 @@ namespace GIGANTECORE.Utils
         {
             _context = context;
             _bucketName = Environment.GetEnvironmentVariable("GOOGLE_STORAGE_BUCKET");
-                
             _folderPath = Environment.GetEnvironmentVariable("PRODUCT_IMAGES_PATH");
-
         }
 
         public async Task<object> Upload(IFormFile file)
@@ -57,7 +55,12 @@ namespace GIGANTECORE.Utils
             }
             catch (Exception ex)
             {
-                return new { success = false, message = $"Error al subir archivo: {ex.Message}" };
+                string errorMessage = ex.Message;
+                if (ex.InnerException != null)
+                {
+                    errorMessage += $" Inner exception: {ex.InnerException.Message}";
+                }
+                return new { success = false, message = $"Error al subir archivo: {errorMessage}" };
             }
         }
 
@@ -71,20 +74,34 @@ namespace GIGANTECORE.Utils
                 await storageClient.DeleteObjectAsync(_bucketName, fileName);
                 return true;
             }
-            catch
+            catch (Exception ex)
             {
+                // Opcionalmente, puedes registrar el error aquí
+                Console.WriteLine($"Error al eliminar archivo: {ex.Message}");
                 return false;
             }
         }
 
         public async Task<object> Update(IFormFile newFile, string oldFileName)
         {
-            if (!string.IsNullOrEmpty(oldFileName))
+            try
             {
-                await Delete(oldFileName);
-            }
+                if (!string.IsNullOrEmpty(oldFileName))
+                {
+                    await Delete(oldFileName);
+                }
 
-            return await Upload(newFile);
+                return await Upload(newFile);
+            }
+            catch (Exception ex)
+            {
+                string errorMessage = ex.Message;
+                if (ex.InnerException != null)
+                {
+                    errorMessage += $" Inner exception: {ex.InnerException.Message}";
+                }
+                return new { success = false, message = $"Error al actualizar archivo: {errorMessage}" };
+            }
         }
 
         private string GetContentType(string extension)

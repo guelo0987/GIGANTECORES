@@ -25,14 +25,14 @@ public class SubCategoriaController : ControllerBase
     [HttpGet]
     public async Task<IActionResult> GetSubCategorias()
     {
-        return Ok(await _db.SubCategoria.ToListAsync());
+        return Ok(await _db.subcategoria.ToListAsync());
     }
     
     
     [HttpGet("{id}")]
     public async Task<IActionResult> GetSubCategoriaId(int id)
     {
-        var subCategorium = await _db.SubCategoria
+        var subCategorium = await _db.subcategoria
             .FirstOrDefaultAsync(u => u.Id == id);
 
         if (subCategorium == null)
@@ -57,21 +57,21 @@ public class SubCategoriaController : ControllerBase
             return BadRequest(new { Message = "El nombre de la subcategoría es obligatorio." });
         }
 
-        if (subCategoria.CategoriaId <= 0 || !_db.Categoria.Any(c => c.Id == subCategoria.CategoriaId))
+        if (subCategoria.CategoriaId <= 0 || !_db.categoria.Any(c => c.Id == subCategoria.CategoriaId))
         {
             return BadRequest(new { Message = "La categoría asociada no es válida." });
         }
 
         if (subCategoria.Id > 0) // Actualizar subcategoría existente
         {
-            var existingSubCategoria = await _db.SubCategoria.FirstOrDefaultAsync(sc => sc.Id == subCategoria.Id);
+            var existingSubCategoria = await _db.subcategoria.FirstOrDefaultAsync(sc => sc.Id == subCategoria.Id);
 
             if (existingSubCategoria == null)
             {
                 return NotFound(new { Message = "La subcategoría no fue encontrada para su actualización." });
             }
 
-            if (await _db.SubCategoria.AnyAsync(sc => sc.Id != subCategoria.Id && sc.Nombre.ToLower() == subCategoria.Nombre.ToLower()))
+            if (await _db.subcategoria.AnyAsync(sc => sc.Id != subCategoria.Id && sc.Nombre.ToLower() == subCategoria.Nombre.ToLower()))
             {
                 return Conflict(new { Message = $"Ya existe otra subcategoría con el nombre '{subCategoria.Nombre}'." });
             }
@@ -85,18 +85,18 @@ public class SubCategoriaController : ControllerBase
         }
         else // Crear nueva subcategoría
         {
-            if (await _db.SubCategoria.AnyAsync(sc => sc.Nombre.ToLower() == subCategoria.Nombre.ToLower()))
+            if (await _db.subcategoria.AnyAsync(sc => sc.Nombre.ToLower() == subCategoria.Nombre.ToLower()))
             {
                 return Conflict(new { Message = $"Ya existe una subcategoría con el nombre '{subCategoria.Nombre}'." });
             }
 
-            var newSubCategoria = new SubCategorium
+            var newSubCategoria = new subcategoria
             {
                 Nombre = subCategoria.Nombre,
                 CategoriaId = subCategoria.CategoriaId
             };
 
-            await _db.SubCategoria.AddAsync(newSubCategoria);
+            await _db.subcategoria.AddAsync(newSubCategoria);
             await _db.SaveChangesAsync();
 
             return Ok(new { Message = "Subcategoría creada exitosamente.", SubCategoria = newSubCategoria });
@@ -106,13 +106,13 @@ public class SubCategoriaController : ControllerBase
     [HttpDelete("{id}")]
     public async Task<IActionResult> DeleteSubCategoria(int id)
     {
-        var subCategoria = await _db.SubCategoria.FirstOrDefaultAsync(sc => sc.Id == id);
+        var subCategoria = await _db.subcategoria.FirstOrDefaultAsync(sc => sc.Id == id);
         if (subCategoria == null)
         {
             return NotFound(new { Message = "La subcategoría no fue encontrada." });
         }
 
-        _db.SubCategoria.Remove(subCategoria);
+        _db.subcategoria.Remove(subCategoria);
         await _db.SaveChangesAsync();
 
         return Ok(new { Message = "Subcategoría eliminada exitosamente." });
