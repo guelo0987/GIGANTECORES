@@ -51,7 +51,7 @@ public class RolePermissionMiddleware
         }
 
         var endpoint = context.GetEndpoint();
-        var controllerName = endpoint?.Metadata.GetMetadata<ControllerActionDescriptor>()?.ControllerName;
+        var controllerName = endpoint?.Metadata.GetMetadata<ControllerActionDescriptor>()?.ControllerName.ToLower();
         Console.WriteLine($"Controller Name: {controllerName}");
 
         if (controllerName == null)

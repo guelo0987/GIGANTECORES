@@ -26,7 +26,7 @@ public partial class productos
     public bool? EsDestacado { get; set; }
 
     public string? Medidas { get; set; }
-    public virtual ICollection<Carrito> Carritos { get; set; } = new List<Carrito>();
+    public virtual ICollection<carrito> Carritos { get; set; } = new List<carrito>();
 
     public virtual categoria? Categoria { get; set; }
 

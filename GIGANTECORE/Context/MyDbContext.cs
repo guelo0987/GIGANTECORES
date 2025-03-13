@@ -24,7 +24,7 @@ public partial class MyDbContext : DbContext
 
     public virtual DbSet<compañia> compañia { get; set; }
 
-    public virtual DbSet<DetalleSolicitud> DetalleSolicituds { get; set; }
+    public virtual DbSet<DetalleSolicitud> DetalleSolicitud { get; set; }
 
     public virtual DbSet<HistorialCorreo> HistorialCorreos { get; set; }
 
@@ -34,13 +34,13 @@ public partial class MyDbContext : DbContext
 
     public virtual DbSet<rolepermisos> rolepermisos { get; set; }
 
-    public virtual DbSet<Solicitud> Solicituds { get; set; }
+    public virtual DbSet<Solicitud> Solicitud { get; set; }
 
     public virtual DbSet<subcategoria> subcategoria { get; set; }
 
     public virtual DbSet<usuario_cliente> usuario_cliente { get; set; }
     
-    public virtual DbSet<Carrito> Carrito { get; set; }
+    public virtual DbSet<carrito> carrito { get; set; }
 
     public virtual DbSet<vacantes> vacantes { get; set; }
 
@@ -81,7 +81,7 @@ public partial class MyDbContext : DbContext
                 .OnDelete(DeleteBehavior.SetNull);
         });
 
-        modelBuilder.Entity<Carrito>(entity =>
+        modelBuilder.Entity<carrito>(entity =>
         {
             entity.HasKey(e => e.Id).HasName("PK__Carrito__3214EC0784CC7F99");
 
@@ -231,9 +231,9 @@ public partial class MyDbContext : DbContext
         {
             entity.HasKey(e => e.Id).HasName("PK__UsuarioC__3214EC07D79F99F6");
 
-            entity.ToTable("UsuarioCliente");
+            entity.ToTable("usuario_cliente");
 
-            entity.HasIndex(e => e.Rnc, "IX_UsuarioCliente_RNC");
+            entity.HasIndex(e => e.Rnc, "IX_usuario_cliente_RNC");
 
             entity.Property(e => e.Apellidos).HasMaxLength(100);
             entity.Property(e => e.Ciudad).HasMaxLength(100);
@@ -241,8 +241,8 @@ public partial class MyDbContext : DbContext
             entity.Property(e => e.Dob).HasColumnName("DOB");
             entity.Property(e => e.Email).HasMaxLength(100);
             entity.Property(e => e.FechaIngreso)
-                .HasDefaultValueSql("(getdate())")
-                .HasColumnType("datetime");
+                .HasDefaultValueSql("now()")
+                .HasColumnType("timestamp");
             entity.Property(e => e.Rnc)
                 .HasMaxLength(11)
                 .HasColumnName("RNC");
@@ -252,7 +252,7 @@ public partial class MyDbContext : DbContext
 
             entity.HasOne(d => d.RncNavigation).WithMany(p => p.UsuarioClientes)
                 .HasForeignKey(d => d.Rnc)
-                .HasConstraintName("FK_UsuarioCliente_Compañia");
+                .HasConstraintName("FK_usuario_cliente_compania");
 
             entity.HasOne(d => d.Role)
                 .WithMany(p => p.UsuarioClientes)

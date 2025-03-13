@@ -25,7 +25,7 @@ public class SolicitudController : ControllerBase
     [HttpGet]
     public async Task<IActionResult> GetSolicitudes()
     {
-        return Ok(await _db.Solicituds
+        return Ok(await _db.Solicitud
             .Include(o => o.DetalleSolicituds)
             .Include(o => o.Usuario)
             .ToListAsync());
@@ -34,7 +34,7 @@ public class SolicitudController : ControllerBase
     [HttpGet("{Id}")]
     public async Task<IActionResult> GetSolicitudesId(int Id)
     {
-        var solicitud = await _db.Solicituds
+        var solicitud = await _db.Solicitud
             .Include(o => o.DetalleSolicituds)
             .Include(o => o.Usuario)
             .FirstOrDefaultAsync(u => u.IdSolicitud == Id);

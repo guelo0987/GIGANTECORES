@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace GIGANTECORE.Models;
 
-public partial class Carrito
+public partial class carrito
 {
     public int Id { get; set; }
 

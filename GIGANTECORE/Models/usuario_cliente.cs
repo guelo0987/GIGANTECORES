@@ -30,7 +30,7 @@ public partial class usuario_cliente
     public int RolId { get; set; }
     public virtual roles Role { get; set; } = null!;
 
-    public virtual ICollection<Carrito> Carritos { get; set; } = new List<Carrito>();
+    public virtual ICollection<carrito> Carritos { get; set; } = new List<carrito>();
 
     public virtual ICollection<HistorialCorreo> HistorialCorreos { get; set; } = new List<HistorialCorreo>();
 

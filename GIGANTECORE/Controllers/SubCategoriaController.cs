@@ -106,15 +106,38 @@ public class SubCategoriaController : ControllerBase
     [HttpDelete("{id}")]
     public async Task<IActionResult> DeleteSubCategoria(int id)
     {
-        var subCategoria = await _db.subcategoria.FirstOrDefaultAsync(sc => sc.Id == id);
-        if (subCategoria == null)
+        using var transaction = await _db.Database.BeginTransactionAsync();
+        try
         {
-            return NotFound(new { Message = "La subcategoría no fue encontrada." });
+            var subCategoria = await _db.subcategoria
+                .Include(sc => sc.Productos)
+                .FirstOrDefaultAsync(sc => sc.Id == id);
+
+            if (subCategoria == null)
+            {
+                return NotFound(new { Message = "La subcategoría no fue encontrada." });
+            }
+
+            // Verificar si hay productos asociados
+            if (subCategoria.Productos.Any())
+            {
+                return Conflict(new { 
+                    Message = "No se puede eliminar la subcategoría porque tiene productos asociados.",
+                    ProductosAsociados = subCategoria.Productos.Select(p => new { p.Codigo, p.Nombre })
+                });
+            }
+
+            _db.subcategoria.Remove(subCategoria);
+            await _db.SaveChangesAsync();
+
+            await transaction.CommitAsync();
+            return Ok(new { Message = "Subcategoría eliminada exitosamente." });
         }
-
-        _db.subcategoria.Remove(subCategoria);
-        await _db.SaveChangesAsync();
-
-        return Ok(new { Message = "Subcategoría eliminada exitosamente." });
+        catch (Exception ex)
+        {
+            await transaction.RollbackAsync();
+            _logger.LogError(ex, "Error al eliminar la subcategoría");
+            return StatusCode(500, new { Message = "Error al eliminar la subcategoría.", Error = ex.Message });
+        }
     }
 }

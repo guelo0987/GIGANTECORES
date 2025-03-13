@@ -71,6 +71,20 @@ public class PermissionController : ControllerBase
         return Ok("Permisos actualizados correctamente.");
     }
     
+    [HttpDelete("{id}")]
+    public IActionResult DeletePermission(int id)
+    {
+        var permission = _db.rolepermisos.Find(id);
+        if (permission == null)
+        {
+            return NotFound("Permiso no encontrado");
+        }
+
+        _db.rolepermisos.Remove(permission);
+        _db.SaveChanges();
+        return Ok("Permiso eliminado correctamente");
+    }
+    
     
     
     
