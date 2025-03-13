@@ -22,7 +22,7 @@ public partial class MyDbContext : DbContext
 
     public virtual DbSet<categoria> categoria { get; set; }
 
-    public virtual DbSet<Compañium> Compañia { get; set; }
+    public virtual DbSet<compañia> compañia { get; set; }
 
     public virtual DbSet<DetalleSolicitud> DetalleSolicituds { get; set; }
 
@@ -109,7 +109,7 @@ public partial class MyDbContext : DbContext
             entity.Property(e => e.Nombre).HasMaxLength(100);
         });
 
-        modelBuilder.Entity<Compañium>(entity =>
+        modelBuilder.Entity<compañia>(entity =>
         {
             entity.HasKey(e => e.Rnc).HasName("PK__Compañia__CAFF6951C669784F");
 

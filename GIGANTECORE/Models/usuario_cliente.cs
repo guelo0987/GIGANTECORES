@@ -34,7 +34,7 @@ public partial class usuario_cliente
 
     public virtual ICollection<HistorialCorreo> HistorialCorreos { get; set; } = new List<HistorialCorreo>();
 
-    public virtual Compañium? RncNavigation { get; set; }
+    public virtual compañia? RncNavigation { get; set; }
 
     public virtual ICollection<Solicitud> Solicituds { get; set; } = new List<Solicitud>();
 }
