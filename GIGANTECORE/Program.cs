@@ -64,9 +64,10 @@ else
     // Fall back to the standard PostgreSQL connection
     builder.Services.AddDbContext<MyDbContext>(options =>
         options.UseNpgsql(Environment.GetEnvironmentVariable("DATA_BASE_CONNECTION_STRING")));
-    
-    Log.Information("Using standard PostgreSQL connection");
 }
+
+Log.Information("Using standard PostgreSQL connection");
+
 
 // 3. Controladores
 builder.Services.AddControllers(option => option.ReturnHttpNotAcceptable = true)
