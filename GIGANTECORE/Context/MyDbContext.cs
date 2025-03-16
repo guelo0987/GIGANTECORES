@@ -43,6 +43,8 @@ public partial class MyDbContext : DbContext
     public virtual DbSet<carrito> carrito { get; set; }
 
     public virtual DbSet<vacantes> vacantes { get; set; }
+    
+    public virtual DbSet<mensajes> mensajes { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
