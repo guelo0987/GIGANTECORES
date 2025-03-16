@@ -13,14 +13,14 @@ namespace GIGANTECORE.Controllers;
 [ApiController]
 [Route("api/[controller]")]
 [Authorize]
-public class ProductoController : ControllerBase
+public class ProductosController : ControllerBase
 {
     private readonly MyDbContext _db;
-    private readonly ILogger<ProductoController> _logger;
+    private readonly ILogger<ProductosController> _logger;
     private readonly IConfiguration _configuration;
     private readonly AdminProductoMedia _adminProductoMedia;
 
-    public ProductoController(ILogger<ProductoController> logger, MyDbContext db, IConfiguration configuration)
+    public ProductosController(ILogger<ProductosController> logger, MyDbContext db, IConfiguration configuration)
     {
         _logger = logger;
         _db = db;
