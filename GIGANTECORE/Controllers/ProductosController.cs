@@ -39,16 +39,25 @@ public class ProductosController : ControllerBase
     [HttpGet("{codigo}")]
     public async Task<IActionResult> GetProductoId(int codigo)
     {
-        var producto = await _db.productos
-            .FirstOrDefaultAsync(u => u.Codigo == codigo);
-
-        if (producto == null)
+        try 
         {
-            _logger.LogError($"Producto con ID {codigo} no encontrada.");
-            return NotFound("Producto no encontrada.");
-        }
+            var totalProductos = await _db.productos.CountAsync();
+            var producto = await _db.productos
+                .FirstOrDefaultAsync(u => u.Codigo == codigo);
 
-        return Ok(producto);
+            if (producto == null)
+            {
+                _logger.LogError($"Producto con ID {codigo} no encontrado. Total de productos en BD: {totalProductos}");
+                return NotFound(new { Message = "Producto no encontrado.", TotalProductos = totalProductos });
+            }
+
+            return Ok(producto);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError($"Error al buscar producto: {ex.Message}");
+            return StatusCode(500, new { Message = "Error interno al buscar el producto", Error = ex.Message });
+        }
     }
 
     

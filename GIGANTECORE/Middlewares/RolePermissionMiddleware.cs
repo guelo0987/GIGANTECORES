@@ -22,9 +22,8 @@ public class RolePermissionMiddleware
             path.StartsWith("/api/Auth/login") || 
             path.StartsWith("/api/Auth/register") ||
             path.StartsWith("/swagger") ||
-            path.StartsWith("/api/User") ||
             path.StartsWith("/api/diagnostico/sqltest") ||
-            path.StartsWith("/api/diagnostico/external-ip") ||
+            path.StartsWith("/api/BulkData") ||
             path.StartsWith("/api/diagnostico/get-external-ip")))
         {
             await _next(context);
