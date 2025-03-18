@@ -145,13 +145,6 @@ public class ProductosController : ControllerBase
     }
     
     
-    
-    
-    
-    
-    
-    
-
     [HttpDelete("{codigo}")]
     public async Task<IActionResult> DeleteProducto(int codigo)
     {
@@ -168,5 +161,63 @@ public class ProductosController : ControllerBase
 
         return Ok(new { Message = "Producto eliminado exitosamente." });
     }
+    
+    
+    
+    
+    
+    
+    // NUEVOS ENDPOINTS DESPUES DEL BULK TEST
+    // 1. Filtrar por Categoría y Subcategoría
+    [HttpGet("categoria/{categoriaId}/subcategoria/{subcategoriaId}")]
+    public async Task<IActionResult> GetByCategoriaAndSubcategoria(int categoriaId, int subcategoriaId)
+    {
+        var productos = await _db.productos
+            .Where(p => p.CategoriaId == categoriaId && p.SubCategoriaId == subcategoriaId)
+            .ToListAsync();
+
+        return Ok(productos);
+    }
+    
+    // 2. Mostrar todos los productos de una Categoría
+    [HttpGet("categoria/{categoriaId}")]
+    public async Task<IActionResult> GetByCategoria(int categoriaId)
+    {
+        var productos = await _db.productos
+            .Where(p => p.CategoriaId == categoriaId)
+            .ToListAsync();
+
+        return Ok(productos);
+    }
+    
+    // 3. Listar todas las marcas disponibles
+    [HttpGet("marcas")]
+    public async Task<IActionResult> GetMarcas()
+    {
+        var marcas = await _db.productos
+            .Select(p => p.Marca)
+            .Distinct()
+            .OrderBy(m => m)
+            .ToListAsync();
+
+        return Ok(marcas);
+    }
+
+    // 4. Filtrar productos por Marca
+    [HttpGet("marca/{marca}")]
+    public async Task<IActionResult> GetByMarca(string marca)
+    {
+        if (string.IsNullOrEmpty(marca))
+            return BadRequest("La marca es requerida");
+
+        var productos = await _db.productos
+            .Where(p => p.Marca != null && 
+                        p.Marca.Trim().ToLower() == marca.Trim().ToLower())
+            .ToListAsync();
+
+        return Ok(productos);
+    }
+
+
 
 }
