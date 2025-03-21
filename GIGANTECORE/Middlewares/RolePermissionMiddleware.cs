@@ -22,12 +22,7 @@ public class RolePermissionMiddleware
             path.StartsWith("/api/Auth/login") || 
             path.StartsWith("/api/Auth/register") ||
             path.StartsWith("/swagger") ||
-            path.StartsWith("/api/diagnostico/sqltest") ||
-            path.StartsWith("/api/BulkData") ||
-            path.StartsWith("/api/Productos") ||
-            path.StartsWith("/api/Productos/marcas") ||
-            path.StartsWith("/api/Productos/categorias") ||
-            path.StartsWith("/api/Productos/subcategorias") ||
+            path.StartsWith("/") ||
             path.StartsWith("/api/diagnostico/get-external-ip")))
         {
             await _next(context);
