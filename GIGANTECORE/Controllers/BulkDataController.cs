@@ -189,6 +189,7 @@ public class BulkDataController:ControllerBase
                     try
                     {
                         var codigo = GetIntValue(worksheet.Cells[row, 1].Value);
+                        
                         var nombre = GetStringValue(worksheet.Cells[row, 2].Value);
                         
                         // Si no hay código o nombre, saltamos esta fila
