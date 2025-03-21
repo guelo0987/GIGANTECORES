@@ -109,7 +109,7 @@ public class AuthController:ControllerBase
             issuer: Environment.GetEnvironmentVariable("JWT_ISSUER"),
             audience: Environment.GetEnvironmentVariable("JWT_AUDIENCE"),
             claims: claims,
-            expires: DateTime.UtcNow.AddDays(1),
+            expires: DateTime.UtcNow.AddHours(1),
             signingCredentials: signIn
         );
 
