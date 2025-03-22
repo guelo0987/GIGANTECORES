@@ -152,8 +152,7 @@ builder.Services.AddCors(options =>
             .WithOrigins(
                 "http://localhost:3000",
                 "http://localhost:5203",
-                "https://giganteadminfront-5oz6-3cg6rrosh-jessies-projects-a23b12ca.vercel.app",
-                "https://giganteadminfront-5oz6.vercel.app"
+                "https://giganteadminfront.vercel.app"
             )
             .AllowAnyMethod()
             .AllowAnyHeader()
